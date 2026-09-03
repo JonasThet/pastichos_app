@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- ETIQUETAS MÁGICAS PARA iPHONE (APPLE WEB APP) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pastichos">
     
-    <title>App Pastichos 12.2</title>
+    <title>App Pastichos 13.0</title>
     
     <style>
         :root {
             --primary: #2c3e50; --secondary: #2980b9;
             --accent: #27ae60; --danger: #c0392b; --bg: #ecf0f1;
-            --voice: #8e44ad;
+            --voice: #8e44ad; --edit: #f39c12;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; }
         .container { max-width: 950px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); overflow: hidden; }
@@ -23,8 +22,8 @@
         .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 20px; }
         .header h1 { margin: 0; font-size: 28px; }
         
-        .tabs { display: flex; background: #34495e; }
-        .tab-btn { flex: 1; padding: 15px; text-align: center; color: white; background: none; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .tabs { display: flex; background: #34495e; overflow-x: auto; white-space: nowrap; }
+        .tab-btn { flex: 1; padding: 15px; text-align: center; color: white; background: none; border: none; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .tab-btn:hover { background: rgba(255,255,255,0.1); }
         .tab-btn.active { background: var(--accent); }
         .tab-content { display: none; padding: 30px; }
@@ -52,56 +51,47 @@
         
         .btn { border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
         .btn-add { background: #3498db; font-size: 14px; margin-top: 10px; }
-        .btn-add:hover { background: #2980b9; }
         .btn-clear-all { background: var(--danger); }
-        .btn-clear-all:hover { background: #a93226; }
         .btn-delete { background: #e74c3c; padding: 8px; border-radius: 50%; font-size: 12px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
-        .btn-delete:hover { background: #c0392b; transform: scale(1.1); }
         .btn-calcular { background: #e67e22; width: 100%; font-size: 20px; padding: 18px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(230,126,34,0.3); }
-        .btn-calcular:hover { background: #d35400; transform: translateY(-2px); }
-        .btn-excel { background: var(--accent); padding: 15px 25px; font-size: 16px; display: block; margin: 0 auto 20px auto; width: 100%; text-align: center; }
-        .btn-excel:hover { background: #219653; }
+        .btn-excel { background: var(--accent); padding: 15px 25px; font-size: 16px; display: block; margin: 0 auto 10px auto; width: 100%; text-align: center; }
+        .btn-whatsapp { background: #25D366; width: 100%; font-size: 18px; padding: 15px; margin-top: 15px; text-transform: uppercase; }
 
         .factura-card { background: white; border: 2px dashed #bdc3c7; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
         .factura-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
-        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
         .factura-title { font-size: 18px; font-weight: bold; color: var(--primary); }
-        .btn-eliminar-historial { background: var(--danger); font-size: 12px; padding: 6px 12px; }
-        .btn-eliminar-historial:hover { background: #a93226; }
+        .btn-eliminar-historial { background: var(--danger); font-size: 12px; padding: 6px 10px; }
+        .btn-editar-historial { background: var(--secondary); font-size: 12px; padding: 6px 10px; }
+        
         .factura-details { display: flex; flex-wrap: wrap; gap: 20px; }
         .detalles-box { flex: 1; min-width: 250px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
         .totales-box { flex: 1; min-width: 200px; background: #ebf5fb; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d6eaf8; }
         .ganancia-text { font-size: 24px; color: var(--accent); font-weight: bold; margin-top: 10px; }
         .item-line { display: flex; justify-content: space-between; font-size: 14px; border-bottom: 1px solid #eee; padding: 6px 0; }
+        
+        .respaldo-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-respaldo { background: #7f8c8d; flex: 1; }
 
-        /* =======================================================
-           📱 DISEÑO RESPONSIVO (SE ACTIVA EN PANTALLAS PEQUEÑAS) 
-           ======================================================= */
         @media (max-width: 768px) {
             body { padding: 0; background-color: white; } 
             .container { border-radius: 0; box-shadow: none; max-width: 100%; }
             .header { padding: 15px 10px; }
             .header h1 { font-size: 22px; }
-            .tab-btn { font-size: 14px; padding: 12px 5px; }
+            .tab-btn { font-size: 13px; padding: 12px 5px; }
             .tab-content { padding: 15px; }
-            
             .top-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-            .top-bar h2 { text-align: center; font-size: 20px; margin-bottom: 5px; }
             .btn-clear-all { width: 100%; padding: 12px; }
-            
             .fila { flex-direction: column; gap: 12px; }
             .campo { width: 100%; }
-            
             .ingrediente-row { flex-direction: column; align-items: stretch; gap: 8px; padding: 15px; }
             .ingrediente-row label { text-align: center; font-size: 16px; margin-bottom: 5px; }
             .ingreso-wrapper { justify-content: center; width: 100%; }
             .monto-input { width: 65%; font-size: 16px; padding: 12px; text-align: center; }
-            
             .factura-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .header-right { width: 100%; justify-content: space-between; flex-direction: row-reverse; }
-            .factura-title { font-size: 16px; }
-            .btn-mic { font-size: 16px; padding: 18px; }
-            .btn-calcular { font-size: 18px; padding: 15px; }
+            .header-right { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+            .btn-mic, .btn-calcular, .btn-whatsapp { font-size: 16px; padding: 15px; }
+            .respaldo-bar { flex-direction: column; }
         }
     </style>
 </head>
@@ -109,33 +99,29 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos (Web App)</h1>
+        <h1>🍕 App Pastichos 13.0</h1>
     </div>
     
     <div class="tabs">
-        <button class="tab-btn active" onclick="cambiarPestana('registro')">📝 Registrar Compra</button>
-        <button class="tab-btn" onclick="cambiarPestana('historial')">🗄️ Historial/Excel</button>
+        <button class="tab-btn active" onclick="cambiarPestana('registro')">📝 Registro</button>
+        <button class="tab-btn" onclick="cambiarPestana('historial')">🗄️ Historial</button>
+        <button class="tab-btn" onclick="cambiarPestana('facturacion')">🧾 Facturar a Cliente</button>
     </div>
 
-    <!-- PESTAÑA 1: FORMULARIO -->
+    <!-- PESTAÑA 1: REGISTRO -->
     <div id="registro" class="tab-content active">
-        
-        <!-- BOTÓN DE MICRÓFONO CONTINUO -->
         <button id="btn-microfono" class="btn-mic" onclick="iniciarDictado()">🎙️ Iniciar Dictado Continuo</button>
         <div id="mic-status" class="mic-status"></div>
 
         <div class="top-bar">
-            <h2 style="color: #2c3e50;">Nuevo Registro</h2>
+            <h2 style="color: #2c3e50; margin:0;">Registro de Inversión</h2>
             <button class="btn btn-clear-all" onclick="limpiarTodo()">🧹 Limpiar Precios</button>
         </div>
 
         <div class="seccion">
             <h3>1. Datos del Día</h3>
             <div class="fila">
-                <div class="campo">
-                    <label>Fecha de Compra:</label>
-                    <input type="date" id="fecha">
-                </div>
+                <div class="campo"><label>Fecha de Compra:</label><input type="date" id="fecha"></div>
                 <div class="campo">
                     <label>Tasa del Dólar (Bs/$):</label>
                     <span id="indicador-tasa" class="indicador-api"></span>
@@ -147,7 +133,7 @@
         <div class="seccion">
             <h3>2. Factura Principal (Bs)</h3>
             <div id="lista-factura"></div>
-            <button class="btn btn-add" onclick="agregarItem('lista-factura', false)">+ Añadir artículo a Factura</button>
+            <button class="btn btn-add" onclick="agregarItem('lista-factura', false)">+ Añadir artículo extra</button>
         </div>
 
         <div class="seccion">
@@ -157,160 +143,71 @@
         </div>
 
         <div class="seccion">
-            <h3>4. Ventas</h3>
+            <h3>4. Proyección de Ventas</h3>
             <div class="fila">
-                <div class="campo">
-                    <label>Cantidad de Pastichos:</label>
-                    <input type="number" id="cantPastichos" value="10">
-                </div>
-                <div class="campo">
-                    <label>Precio Venta c/u ($):</label>
-                    <input type="text" id="precioPasticho" value="10,00" oninput="formatearMoneda(event)">
-                </div>
-                <div class="campo">
-                    <label>Ingreso Delivery Total (Bs):</label>
-                    <input type="text" id="deliveryBs" value="0,00" oninput="formatearMoneda(event)">
-                </div>
+                <div class="campo"><label>Cant. Pastichos a Vender:</label><input type="number" id="cantPastichos" value="10"></div>
+                <div class="campo"><label>Precio Venta c/u ($):</label><input type="text" id="precioPasticho" value="10,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Ingreso Delivery Total (Bs):</label><input type="text" id="deliveryBs" value="0,00" oninput="formatearMoneda(event)"></div>
             </div>
         </div>
 
         <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 CALCULAR Y GUARDAR DÍA</button>
     </div>
 
-    <!-- PESTAÑA 2: HISTORIAL -->
+    <!-- PESTAÑA 2: HISTORIAL Y MIGRACIÓN -->
     <div id="historial" class="tab-content">
+        <div class="respaldo-bar">
+            <button class="btn btn-respaldo" onclick="exportarBaseDatos()">💾 Exportar Datos (Para PC)</button>
+            <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Importar Datos (En iPhone)</button>
+            <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarBaseDatos(event)">
+        </div>
         <button class="btn btn-excel" onclick="exportarExcel()">📥 DESCARGAR EXCEL ELEGANTE (.xlsx)</button>
         <div id="contenedor-historial"></div>
     </div>
+
+    <!-- PESTAÑA 3: FACTURACIÓN A CLIENTES -->
+    <div id="facturacion" class="tab-content">
+        <div class="seccion">
+            <h3>🧾 Generar Recibo de Compra</h3>
+            <div class="fila">
+                <div class="campo"><label>Nombre del Cliente:</label><input type="text" id="fac-cliente" placeholder="Ej: Juan Pérez"></div>
+                <div class="campo"><label>Cantidad de Pastichos:</label><input type="number" id="fac-cant" value="1"></div>
+            </div>
+            <div class="fila">
+                <div class="campo"><label>Precio por Pasticho ($):</label><input type="text" id="fac-precio" value="10,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Costo de Delivery ($):</label><input type="text" id="fac-delivery" value="0,00" oninput="formatearMoneda(event)"></div>
+            </div>
+            <div class="fila">
+                <div class="campo">
+                    <label>Tasa BCV del Día (Bs/$):</label>
+                    <input type="text" id="fac-tasa" placeholder="0,00" oninput="formatearMoneda(event)">
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-whatsapp" onclick="generarReciboWA()">📲 Generar y Enviar por WhatsApp</button>
+    </div>
 </div>
 
-<!-- LIBRERÍAS DE EXCEL MOVIDAS AL FONDO PARA NO BLOQUEAR LA PÁGINA -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
 
 <script>
-    // --- 🤖 MOTOR DE IA DE VOZ CONTINUA ---
-    let reconociendo = false;
-    let recognition;
-    
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.lang = 'es-VE'; 
-        recognition.continuous = true; 
-        recognition.interimResults = false;
-        
-        recognition.onstart = function() {
-            reconociendo = true;
-            document.getElementById('btn-microfono').innerHTML = "🔴 Escuchando... (Toca para detener)";
-            document.getElementById('btn-microfono').style.backgroundColor = "#c0392b";
-            mostrarMensajeMic("Micrófono abierto. Dicta de corrido.\nEj: 'Jamón 4700, queso 2500 y carne 9000'", "#d1ecf1", "#0c5460", "#bee5eb");
-        };
-        
-        recognition.onresult = function(event) {
-            try {
-                let last = event.results.length - 1;
-                let frase = event.results[last][0].transcript.toLowerCase();
-                procesarDictadoMultiple(frase);
-            } catch (err) {
-                console.error("Error procesando voz:", err);
-            }
-        };
-        
-        recognition.onerror = function(event) {
-            if(event.error !== 'no-speech') {
-                mostrarMensajeMic("❌ Error en el micrófono. Por favor intenta de nuevo.", "#f8d7da", "#721c24", "#f5c6cb");
-            }
-        };
-        
-        recognition.onend = function() {
-            reconociendo = false;
-            document.getElementById('btn-microfono').innerHTML = "🎙️ Iniciar Dictado Continuo";
-            document.getElementById('btn-microfono').style.backgroundColor = "var(--voice)";
-        };
-    } else {
-        console.warn("Navegador sin Web Speech API nativa.");
-    }
-
-    function iniciarDictado() {
-        if (!recognition) { alert("Tu navegador actual no soporta dictado por voz. Usa Google Chrome o Safari."); return; }
-        if (reconociendo) { recognition.stop(); return; }
-        recognition.start();
-    }
-
-    function mostrarMensajeMic(texto, bg, color, border) {
-        let box = document.getElementById('mic-status');
-        box.innerText = texto;
-        box.style.backgroundColor = bg;
-        box.style.color = color;
-        box.style.borderColor = border;
-        box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 7000);
-    }
-
-    function procesarDictadoMultiple(frase) {
-        const mapaIngredientes = [
-            { id: "Jamón", claves: ["jamón", "jamon"] },
-            { id: "Queso Mozarrella", claves: ["mozzarella", "mozarrela", "queso amarillo", "queso blanco", "queso"] },
-            { id: "Queso Parmesano", claves: ["parmesano", "queso rallado", "don pelayo"] },
-            { id: "Envases de Aluminio", claves: ["envase", "envases", "aluminio", "tapas"] },
-            { id: "Pasta de tomate", claves: ["pasta de tomate", "salsa de tomate", "salsa"] },
-            { id: "Pasta para pasticho", claves: ["pasta para pasticho", "láminas", "pasta capri", "capri"] },
-            { id: "Mantequilla Mavesa", claves: ["mantequilla", "mavesa", "margarina"] },
-            { id: "Cubitos Maggi", claves: ["cubito", "cubitos", "maggi", "caldo"] },
-            { id: "Leche", claves: ["leche", "litro de leche"] },
-            { id: "Cucharillas", claves: ["cucharilla", "cucharillas", "plástico"] },
-            { id: "I.V.A. (16%)", claves: ["iva", "impuesto"] },
-            { id: "Carne molida", claves: ["carne", "molida", "kilo de carne"] },
-            { id: "Pan Campesino", claves: ["pan", "campesino", "panadería"] },
-            { id: "Nuez Moscada", claves: ["nuez", "moscada", "especias"] },
-            { id: "Aliños (Tomate/Cebolla/etc)", claves: ["aliño", "aliños", "cebolla", "tomate", "zanahoria", "cilantro", "pimentón"] }
-        ];
-
-        let actualizados = [];
-
-        for (let item of mapaIngredientes) {
-            for (let clave of item.claves) {
-                let index = frase.indexOf(clave);
-                if (index !== -1) {
-                    let restoFrase = frase.substring(index + clave.length);
-                    let matchRegex = restoFrase.match(/^[^\d]*(\d+(?:[.,]\d+)?|\d+\s*(?:con|coma|punto|y)\s*\d+)/);
-                    
-                    if (matchRegex) {
-                        let numeroBruto = matchRegex[1];
-                        let numeroLimpio = numeroBruto.replace(/\s+(con|coma|punto|y)\s+/g, '.').replace(',', '.');
-                        let valorFloat = parseFloat(numeroLimpio);
-                        
-                        if (!isNaN(valorFloat)) {
-                            let inputs = document.querySelectorAll('.monto-input');
-                            inputs.forEach(input => {
-                                if (input.dataset.nombre === item.id) {
-                                    let valorRawParaInput = Math.round(valorFloat * 100).toString();
-                                    input.value = valorRawParaInput;
-                                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                                    actualizados.push(`${item.id}: ${input.value} Bs`);
-                                }
-                            });
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (actualizados.length > 0) {
-            mostrarMensajeMic(`✅ ¡Registrado!\n${actualizados.join(' | ')}`, "#d4edda", "#155724", "#c3e6cb");
-        } else {
-            mostrarMensajeMic(`Escuché: "${frase}".\nNo detecté un artículo con su precio. Intenta de nuevo.`, "#fff3cd", "#856404", "#ffeeba");
-        }
-    }
-
     // --- 🗄️ BASE DE DATOS Y LÓGICA CORE ---
-    const fFactura = ["Jamón", "Queso Mozarrella", "Queso Parmesano", "Envases de Aluminio", "Pasta de tomate", "Pasta para pasticho", "Mantequilla Mavesa", "Cubitos Maggi", "Leche", "Cucharillas", "I.V.A. (16%)"];
-    const fAdicionales = ["Carne molida", "Pan Campesino", "Nuez Moscada", "Aliños (Tomate/Cebolla/etc)"];
+    const fFacturaBase = ["Jamón", "Queso Mozarrella", "Queso Parmesano", "Envases de Aluminio", "Pasta de tomate", "Pasta para pasticho", "Mantequilla Mavesa", "Cubitos Maggi", "Leche", "Cucharillas", "I.V.A. (16%)"];
+    const fAdicionalesBase = ["Carne molida", "Pan Campesino", "Nuez Moscada", "Aliños (Tomate/Cebolla/etc)"];
     
     let dbHistorial = JSON.parse(localStorage.getItem('pastichosDB')) || [];
     let dbTasas = JSON.parse(localStorage.getItem('tasasBCV_Memoria')) || {};
+
+    function cambiarPestana(id) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(id === 'facturacion') {
+            document.getElementById('fac-tasa').value = document.getElementById('tasa').value;
+        }
+    }
 
     function obtenerFechaLocal() {
         const tzoffset = (new Date()).getTimezoneOffset() * 60000;
@@ -326,42 +223,10 @@
         return integers + ',' + parts[1];
     }
 
-    async function buscarTasa() {
-        let inputFecha = document.getElementById('fecha').value;
-        let inputTasa = document.getElementById('tasa');
-        let indicador = document.getElementById('indicador-tasa');
-        
-        if (!inputFecha) return;
-        indicador.style.display = 'none';
-
-        let hoyStr = obtenerFechaLocal();
-
-        if (inputFecha === hoyStr) {
-            inputTasa.placeholder = "Buscando BCV...";
-            inputTasa.value = "";
-            try {
-                let res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
-                let data = await res.json();
-                if (data.promedio) {
-                    inputTasa.value = floatAFormatoMoneda(data.promedio);
-                    indicador.innerText = "✓ BCV Oficial (En vivo)";
-                    indicador.style.color = "#27ae60";
-                    indicador.style.display = 'block';
-                    return;
-                }
-            } catch(e) { inputTasa.placeholder = "0,00"; }
-        } 
-        
-        if (dbTasas[inputFecha]) {
-            inputTasa.value = floatAFormatoMoneda(dbTasas[inputFecha]);
-            indicador.innerText = "✓ Tasa Guardada en Memoria";
-            indicador.style.color = "#2980b9";
-            indicador.style.display = 'block';
-            return;
-        }
-
-        inputTasa.value = "";
-        inputTasa.placeholder = "0,00";
+    function parsearMoneda(valorString) {
+        if (!valorString) return 0;
+        let numero = valorString.replace(/\./g, '').replace(',', '.');
+        return parseFloat(numero) || 0;
     }
 
     function formatearMoneda(e) {
@@ -375,21 +240,67 @@
         input.value = integers + ',' + cents;
     }
 
-    function parsearMoneda(valorString) {
-        if (!valorString) return 0;
-        let numero = valorString.replace(/\./g, '').replace(',', '.');
-        return parseFloat(numero) || 0;
+    // --- NUEVO MÓDULO: FACTURACIÓN ---
+    function generarReciboWA() {
+        let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente";
+        let cant = parseInt(document.getElementById('fac-cant').value) || 1;
+        let precio = parsearMoneda(document.getElementById('fac-precio').value);
+        let delivery = parsearMoneda(document.getElementById('fac-delivery').value);
+        let tasa = parsearMoneda(document.getElementById('fac-tasa').value);
+
+        if(tasa <= 0) { alert("Debes ingresar la tasa BCV para calcular en Bolívares."); return; }
+
+        let totalUSD = (cant * precio) + delivery;
+        let totalBs = totalUSD * tasa;
+
+        let mensaje = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n`;
+        mensaje += `👤 *Cliente:* ${cliente}\n`;
+        mensaje += `📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precio)}\n`;
+        if(delivery > 0) mensaje += `🛵 *Delivery:* $${floatAFormatoMoneda(delivery)}\n`;
+        mensaje += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD)}*\n`;
+        mensaje += `🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n`;
+        mensaje += `_(Calculado a Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n`;
+        mensaje += `¡Gracias por preferirnos! 🍕`;
+
+        let url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+        window.open(url, '_blank');
     }
 
+    // --- RESPALDO Y MIGRACIÓN (Para pasar de PC a iPhone) ---
+    function exportarBaseDatos() {
+        let data = { historial: dbHistorial, tasas: dbTasas };
+        let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+        saveAs(blob, "Respaldo_Pastichos.json");
+    }
+
+    function importarBaseDatos(event) {
+        let file = event.target.files[0];
+        if (!file) return;
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                let data = JSON.parse(e.target.result);
+                if (data.historial && data.tasas) {
+                    localStorage.setItem('pastichosDB', JSON.stringify(data.historial));
+                    localStorage.setItem('tasasBCV_Memoria', JSON.stringify(data.tasas));
+                    dbHistorial = data.historial;
+                    dbTasas = data.tasas;
+                    renderizarHistorial();
+                    alert("¡Historial importado con éxito!");
+                } else { alert("El archivo no tiene el formato correcto."); }
+            } catch (err) { alert("Error al leer el archivo."); }
+        };
+        reader.readAsText(file);
+    }
+
+    // --- LÓGICA DEL FORMULARIO Y EDICIÓN ---
     function crearFilaHTML(nombre, esFijo, idUnico) {
         let esIva = (nombre === "I.V.A. (16%)");
         let extraStyle = esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : "";
-        let extraLabel = esIva ? "🧾 " : "";
         let labelColor = esIva ? "color: #856404; font-weight: bold;" : "";
-
         return `
             <div class="ingrediente-row" id="row-${idUnico}" style="${extraStyle}">
-                <label style="${labelColor}">${extraLabel}${nombre}</label>
+                <label style="${labelColor}">${esIva ? '🧾 ' : ''}${nombre}</label>
                 <div class="ingreso-wrapper">
                     <input type="text" class="monto-input" data-nombre="${nombre}" data-tipo="${esFijo ? 'fijo' : 'nuevo'}" oninput="formatearMoneda(event)" placeholder="0,00">
                     <button class="btn btn-delete" onclick="borrarFila('row-${idUnico}', ${esFijo})" title="Borrar">❌</button>
@@ -398,19 +309,50 @@
         `;
     }
 
-    function cargarListas() {
-        const divF = document.getElementById('lista-factura');
-        const divA = document.getElementById('lista-adicionales');
-        
-        fFactura.forEach((ing, i) => divF.innerHTML += crearFilaHTML(ing, true, 'F'+i));
-        fAdicionales.forEach((ing, i) => divA.innerHTML += crearFilaHTML(ing, true, 'A'+i));
-        
+    function cargarListasLimpias() {
+        document.getElementById('lista-factura').innerHTML = "";
+        document.getElementById('lista-adicionales').innerHTML = "";
+        fFacturaBase.forEach((ing, i) => document.getElementById('lista-factura').innerHTML += crearFilaHTML(ing, true, 'F'+i));
+        fAdicionalesBase.forEach((ing, i) => document.getElementById('lista-adicionales').innerHTML += crearFilaHTML(ing, true, 'A'+i));
+    }
+
+    window.onload = () => {
+        cargarListasLimpias();
         let fechaInput = document.getElementById('fecha');
         fechaInput.value = obtenerFechaLocal();
         fechaInput.addEventListener('change', buscarTasa);
-        
         buscarTasa(); 
         renderizarHistorial();
+    };
+
+    async function buscarTasa() {
+        let inputFecha = document.getElementById('fecha').value;
+        let inputTasa = document.getElementById('tasa');
+        let indicador = document.getElementById('indicador-tasa');
+        
+        if (!inputFecha) return;
+        indicador.style.display = 'none';
+
+        if (inputFecha === obtenerFechaLocal()) {
+            inputTasa.placeholder = "Buscando BCV...";
+            inputTasa.value = "";
+            try {
+                let res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+                let data = await res.json();
+                if (data.promedio) {
+                    inputTasa.value = floatAFormatoMoneda(data.promedio);
+                    indicador.innerText = "✓ BCV Oficial (En vivo)";
+                    indicador.style.display = 'block'; return;
+                }
+            } catch(e) { inputTasa.placeholder = "0,00"; }
+        } 
+        
+        if (dbTasas[inputFecha]) {
+            inputTasa.value = floatAFormatoMoneda(dbTasas[inputFecha]);
+            indicador.innerText = "✓ Tasa en Memoria";
+            indicador.style.display = 'block'; return;
+        }
+        inputTasa.value = ""; inputTasa.placeholder = "0,00";
     }
 
     function agregarItem(idContenedor, esFijo) {
@@ -422,23 +364,70 @@
     }
 
     function borrarFila(idRow, esFijo) {
-        if (esFijo) { document.querySelector(`#${idRow} input`).value = ""; } 
-        else { document.getElementById(idRow).remove(); }
+        if (esFijo) document.querySelector(`#${idRow} input`).value = "";
+        else document.getElementById(idRow).remove();
     }
 
     function limpiarTodo() {
         if(confirm("¿Seguro que quieres borrar todos los precios ingresados?")) {
-            document.querySelectorAll('.monto-input, #deliveryBs').forEach(input => input.value = "");
+            document.querySelectorAll('.monto-input, #deliveryBs').forEach(i => i.value = "");
             document.getElementById('cantPastichos').value = "10";
             document.getElementById('precioPasticho').value = "10,00";
             buscarTasa();
         }
     }
 
+    // --- NUEVO: EDICIÓN DE HISTORIAL ---
+    function editarRegistroHistorial(id) {
+        let reg = dbHistorial.find(r => r.id === id);
+        if(!reg) return;
+        if(!confirm("Vamos a enviar este día al formulario para que puedas corregir los precios. Al guardar, reemplazará al actual. ¿Continuar?")) return;
+
+        document.getElementById('fecha').value = reg.fecha;
+        document.getElementById('tasa').value = floatAFormatoMoneda(reg.tasa);
+        document.getElementById('cantPastichos').value = reg.cantP || 10;
+        document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 10);
+        document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
+
+        cargarListasLimpias(); // Reinicia la vista
+
+        let poblarLista = (listaGuardada, contenedorId) => {
+            listaGuardada.forEach(item => {
+                let input = document.querySelector(`#${contenedorId} input[data-nombre="${item.nombre}"]`);
+                if(!input) {
+                    let idUnico = 'Nuevo' + Math.floor(Math.random() * 10000);
+                    document.getElementById(contenedorId).insertAdjacentHTML('beforeend', crearFilaHTML(item.nombre, false, idUnico));
+                    input = document.querySelector(`#row-${idUnico} input`);
+                }
+                input.value = Math.round(item.bs * 100).toString();
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+        };
+
+        poblarLista(reg.factura, 'lista-factura');
+        poblarLista(reg.adicionales, 'lista-adicionales');
+
+        // Borra el viejo para que el usuario guarde el nuevo limpio
+        borrarRegistroSilencioso(id);
+        cambiarPestana('registro');
+        window.scrollTo(0,0);
+    }
+
+    function borrarRegistroSilencioso(id) {
+        dbHistorial = dbHistorial.filter(reg => reg.id !== id);
+        localStorage.setItem('pastichosDB', JSON.stringify(dbHistorial));
+        renderizarHistorial();
+    }
+
+    function borrarRegistroHistorial(id) {
+        if(confirm("¿Estás seguro de eliminar este registro permanentemente?")) {
+            borrarRegistroSilencioso(id);
+        }
+    }
+
     function calcularYGuardar() {
         let fecha = document.getElementById('fecha').value;
-        let tasaStr = document.getElementById('tasa').value;
-        let tasa = parsearMoneda(tasaStr);
+        let tasa = parsearMoneda(document.getElementById('tasa').value);
         if (tasa <= 0) { alert("¡Falta la tasa del dólar!"); return; }
 
         let detallesFactura = []; let detallesAdicionales = [];
@@ -448,7 +437,6 @@
             let val = parsearMoneda(input.value);
             if (val > 0) { detallesFactura.push({ nombre: input.dataset.nombre, bs: val }); totalBsF += val; }
         });
-
         document.querySelectorAll('#lista-adicionales .monto-input').forEach(input => {
             let val = parsearMoneda(input.value);
             if (val > 0) { detallesAdicionales.push({ nombre: input.dataset.nombre, bs: val }); totalBsA += val; }
@@ -465,8 +453,7 @@
         let ingresosUSD = (cantP * precioP) + (deliveryBs / tasa);
         let gananciaUSD = ingresosUSD - totalGastosUSD;
 
-        dbTasas[fecha] = tasa;
-        localStorage.setItem('tasasBCV_Memoria', JSON.stringify(dbTasas));
+        dbTasas[fecha] = tasa; localStorage.setItem('tasasBCV_Memoria', JSON.stringify(dbTasas));
 
         let registro = {
             id: Date.now(), fecha: fecha, tasa: tasa, 
@@ -478,8 +465,8 @@
 
         dbHistorial.push(registro);
         localStorage.setItem('pastichosDB', JSON.stringify(dbHistorial)); 
-        alert(`¡Día guardado con éxito!\nGanancia neta calculada: $${gananciaUSD.toFixed(2)}`);
-        limpiarTodo(); renderizarHistorial(); cambiarPestana('historial');
+        alert(`¡Día guardado con éxito!\nGanancia neta: $${gananciaUSD.toFixed(2)}`);
+        limpiarTodo(); cargarListasLimpias(); renderizarHistorial(); cambiarPestana('historial');
     }
 
     function renderizarHistorial() {
@@ -491,11 +478,9 @@
         dbReverse.forEach(reg => {
             let htmlFactura = `<div class="detalles-box"><strong>🧾 Factura Principal</strong><br>`;
             reg.factura.forEach(f => {
-                let isIva = f.nombre === "I.V.A. (16%)";
-                let style = isIva ? 'font-weight: bold; color: #856404; background: #fff3cd; padding: 2px 5px; border-radius: 4px;' : '';
+                let style = (f.nombre === "I.V.A. (16%)") ? 'font-weight: bold; color: #856404; background: #fff3cd; padding: 2px 5px; border-radius: 4px;' : '';
                 htmlFactura += `<div class="item-line" style="${style}"><span>${f.nombre}</span> <span>${f.bs.toLocaleString('es-VE')} Bs</span></div>`;
-            });
-            htmlFactura += `</div>`;
+            }); htmlFactura += `</div>`;
 
             let htmlAdic = `<div class="detalles-box"><strong>➕ Gastos Adicionales</strong><br>`;
             reg.adicionales.forEach(a => htmlAdic += `<div class="item-line"><span>${a.nombre}</span> <span>${a.bs.toLocaleString('es-VE')} Bs</span></div>`);
@@ -504,10 +489,11 @@
             divH.innerHTML += `
                 <div class="factura-card">
                     <div class="factura-header">
-                        <span class="factura-title">📅 Fecha: ${reg.fecha}</span>
+                        <span class="factura-title">📅 ${reg.fecha}</span>
                         <div class="header-right">
-                            <span style="font-weight:bold;">Tasa: ${reg.tasa.toLocaleString('es-VE')} Bs/$</span>
-                            <button class="btn btn-eliminar-historial" onclick="borrarRegistroHistorial(${reg.id})">Borrar Día</button>
+                            <span style="font-weight:bold;">Tasa: ${reg.tasa.toLocaleString('es-VE')} Bs</span>
+                            <button class="btn btn-editar-historial" onclick="editarRegistroHistorial(${reg.id})">✏️ Editar</button>
+                            <button class="btn btn-eliminar-historial" onclick="borrarRegistroHistorial(${reg.id})">❌ Borrar</button>
                         </div>
                     </div>
                     <div class="factura-details">${htmlFactura}${htmlAdic}
@@ -523,169 +509,104 @@
         });
     }
 
-    function borrarRegistroHistorial(id) {
-        if(confirm("¿Estás seguro de eliminar este registro?")) {
-            dbHistorial = dbHistorial.filter(reg => reg.id !== id);
-            localStorage.setItem('pastichosDB', JSON.stringify(dbHistorial));
-            renderizarHistorial();
+    // --- 🤖 MOTOR DE IA DE VOZ ---
+    let reconociendo = false;
+    let recognition;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'es-VE'; recognition.continuous = true; recognition.interimResults = false;
+        
+        recognition.onstart = function() {
+            reconociendo = true;
+            document.getElementById('btn-microfono').innerHTML = "🔴 Escuchando... (Toca para detener)";
+            document.getElementById('btn-microfono').style.backgroundColor = "#c0392b";
+            mostrarMensajeMic("Micrófono abierto. Dicta de corrido.", "#d1ecf1", "#0c5460", "#bee5eb");
+        };
+        recognition.onresult = function(event) {
+            try {
+                let last = event.results.length - 1;
+                procesarDictadoMultiple(event.results[last][0].transcript.toLowerCase());
+            } catch (err) { console.error(err); }
+        };
+        recognition.onerror = function(event) {
+            if(event.error !== 'no-speech') mostrarMensajeMic("❌ Error al escuchar. Intenta de nuevo.", "#f8d7da", "#721c24", "#f5c6cb");
+        };
+        recognition.onend = function() {
+            reconociendo = false;
+            document.getElementById('btn-microfono').innerHTML = "🎙️ Iniciar Dictado Continuo";
+            document.getElementById('btn-microfono').style.backgroundColor = "var(--voice)";
+        };
+    }
+    function iniciarDictado() {
+        if (!recognition) { alert("Tu navegador actual no soporta dictado por voz."); return; }
+        if (reconociendo) recognition.stop(); else recognition.start();
+    }
+    function mostrarMensajeMic(texto, bg, color, border) {
+        let box = document.getElementById('mic-status');
+        box.innerText = texto; box.style.backgroundColor = bg; box.style.color = color; box.style.borderColor = border; box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 7000);
+    }
+    function procesarDictadoMultiple(frase) {
+        const mapa = [
+            { id: "Jamón", claves: ["jamón", "jamon"] }, { id: "Queso Mozarrella", claves: ["mozzarella", "mozarrela", "queso amarillo", "queso blanco", "queso"] },
+            { id: "Queso Parmesano", claves: ["parmesano", "queso rallado", "don pelayo"] }, { id: "Envases de Aluminio", claves: ["envase", "envases", "aluminio", "tapas"] },
+            { id: "Pasta de tomate", claves: ["pasta de tomate", "salsa de tomate", "salsa"] }, { id: "Pasta para pasticho", claves: ["pasta para pasticho", "láminas", "pasta capri", "capri"] },
+            { id: "Mantequilla Mavesa", claves: ["mantequilla", "mavesa", "margarina"] }, { id: "Cubitos Maggi", claves: ["cubito", "cubitos", "maggi", "caldo"] },
+            { id: "Leche", claves: ["leche", "litro de leche"] }, { id: "Cucharillas", claves: ["cucharilla", "cucharillas", "plástico"] },
+            { id: "I.V.A. (16%)", claves: ["iva", "impuesto"] }, { id: "Carne molida", claves: ["carne", "molida", "kilo de carne"] },
+            { id: "Pan Campesino", claves: ["pan", "campesino", "panadería"] }, { id: "Nuez Moscada", claves: ["nuez", "moscada", "especias"] },
+            { id: "Aliños (Tomate/Cebolla/etc)", claves: ["aliño", "aliños", "cebolla", "tomate", "zanahoria", "cilantro", "pimentón"] }
+        ];
+        let actualizados = [];
+        for (let item of mapa) {
+            for (let clave of item.claves) {
+                let index = frase.indexOf(clave);
+                if (index !== -1) {
+                    let restoFrase = frase.substring(index + clave.length);
+                    let match = restoFrase.match(/^[^\d]*(\d+(?:[.,]\d+)?|\d+\s*(?:con|coma|punto|y)\s*\d+)/);
+                    if (match) {
+                        let numLimpio = match[1].replace(/\s+(con|coma|punto|y)\s+/g, '.').replace(',', '.');
+                        let valFloat = parseFloat(numLimpio);
+                        if (!isNaN(valFloat)) {
+                            document.querySelectorAll('.monto-input').forEach(input => {
+                                if (input.dataset.nombre === item.id) {
+                                    input.value = Math.round(valFloat * 100).toString();
+                                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                                    actualizados.push(`${item.id}: ${input.value} Bs`);
+                                }
+                            });
+                        }
+                    }
+                    break;
+                }
+            }
         }
+        if (actualizados.length > 0) mostrarMensajeMic(`✅ ¡Registrado!\n${actualizados.join(' | ')}`, "#d4edda", "#155724", "#c3e6cb");
+        else mostrarMensajeMic(`Escuché: "${frase}".\nNo detecté un artículo con su precio. Intenta de nuevo.`, "#fff3cd", "#856404", "#ffeeba");
     }
 
+    // EXPORTADOR EXCEL
     async function exportarExcel() {
         if (typeof ExcelJS === 'undefined') { alert("Cargando librerías, intenta en un segundo..."); return; }
         if (dbHistorial.length === 0) { alert("No hay datos para exportar"); return; }
         
         const wb = new ExcelJS.Workbook();
-        
         const headerBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003366' } };
-        const headerGreen = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF274E13' } };
         const textWhite = { color: { argb: 'FFFFFFFF' }, bold: true };
-        const textBlueGanancia = { color: { argb: 'FF0033CC' }, bold: true };
         const center = { horizontal: 'center', vertical: 'middle' };
 
-        const ws1 = wb.addWorksheet("Resumen General");
-        ws1.columns = [{ key: 'a', width: 15 }, { key: 'b', width: 18 }, { key: 'c', width: 22 }, { key: 'd', width: 25 }, { key: 'e', width: 22 }, { key: 'f', width: 20 }];
-        ws1.mergeCells('A1:F1');
-        ws1.getCell('A1').value = 'Control de Gastos de Inversión (Pastichos)';
-        ws1.getCell('A1').font = { size: 14, bold: true };
-        ws1.getCell('A1').alignment = center;
-        ws1.addRow([]);
-
-        let rH1 = ws1.addRow(['Fecha', 'Tasa USD (Bs)', 'Gastos Factura (Bs)', 'Gastos Adicionales (Bs)', 'Total Gastado (Bs)', 'Total Gastado ($)']);
-        rH1.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
-
-        let sBs1 = 0, sUsd1 = 0;
+        const ws1 = wb.addWorksheet("Resumen");
+        ws1.columns = [{ width: 15 }, { width: 18 }, { width: 22 }, { width: 25 }, { width: 22 }, { width: 20 }];
+        ws1.addRow(['Fecha', 'Tasa USD (Bs)', 'Gastos Factura (Bs)', 'Gastos Adicionales (Bs)', 'Total Gastado (Bs)', 'Total Gastado ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
         dbHistorial.forEach(reg => {
-            let fBs = reg.factura.reduce((s, i) => s + i.bs, 0);
-            let aBs = reg.adicionales.reduce((s, i) => s + i.bs, 0);
-            let row = ws1.addRow([reg.fecha, reg.tasa, fBs, aBs, reg.totalGastosBs, reg.totalGastosUSD]);
-            row.getCell(2).numFmt = '#,##0.00 "Bs"'; row.getCell(3).numFmt = '#,##0.00 "Bs"';
-            row.getCell(4).numFmt = '#,##0.00 "Bs"'; row.getCell(5).numFmt = '#,##0.00 "Bs"';
-            row.getCell(6).numFmt = '"$"#,##0.00';
-            sBs1 += reg.totalGastosBs; sUsd1 += reg.totalGastosUSD;
-        });
-
-        let rT1 = ws1.addRow(['', '', '', 'TOTAL GENERAL', sBs1, sUsd1]);
-        rT1.getCell(4).font = { bold: true }; rT1.getCell(4).alignment = { horizontal: 'right' };
-        rT1.getCell(5).font = { bold: true }; rT1.getCell(5).numFmt = '#,##0.00 "Bs"';
-        rT1.getCell(6).font = { bold: true }; rT1.getCell(6).numFmt = '"$"#,##0.00';
-
-        const ws2 = wb.addWorksheet("Desglose Detallado");
-        ws2.columns = [{ width: 40 }, { width: 22 }, { width: 22 }];
-        ws2.mergeCells('A1:C1');
-        ws2.getCell('A1').value = 'Desglose Específico por Día de Compra';
-        ws2.getCell('A1').font = { size: 14, bold: true };
-        ws2.getCell('A1').alignment = center;
-        ws2.addRow([]);
-
-        dbHistorial.forEach(reg => {
-            let rD = ws2.addRow([`Compra del ${reg.fecha} (Tasa: ${reg.tasa} Bs/$)`]);
-            ws2.mergeCells(`A${rD.number}:C${rD.number}`);
-            rD.getCell(1).fill = headerBlue; rD.getCell(1).font = textWhite;
-
-            let rS = ws2.addRow(['Descripción del Artículo', 'Monto (Bs)', 'Monto ($)']);
-            rS.eachCell(c => c.font = { bold: true });
-
-            let rF = ws2.addRow(['--- FACTURA PRINCIPAL ---']);
-            ws2.mergeCells(`A${rF.number}:C${rF.number}`);
-            rF.getCell(1).font = { bold: true, italic: true }; rF.getCell(1).alignment = center;
-
-            reg.factura.forEach(i => {
-                let rI = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]);
-                rI.getCell(2).numFmt = '#,##0.00 "Bs"'; rI.getCell(3).numFmt = '"$"#,##0.00';
-            });
-
-            let rA = ws2.addRow(['--- GASTOS ADICIONALES ---']);
-            ws2.mergeCells(`A${rA.number}:C${rA.number}`);
-            rA.getCell(1).font = { bold: true, italic: true }; rA.getCell(1).alignment = center;
-
-            reg.adicionales.forEach(i => {
-                let rI = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]);
-                rI.getCell(2).numFmt = '#,##0.00 "Bs"'; rI.getCell(3).numFmt = '"$"#,##0.00';
-            });
-
-            let rT = ws2.addRow(['TOTAL DEL DÍA', reg.totalGastosBs, reg.totalGastosUSD]);
-            rT.eachCell(c => { c.font = { bold: true }; c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEAEEF2' }}; });
-            rT.getCell(2).numFmt = '#,##0.00 "Bs"'; rT.getCell(3).numFmt = '"$"#,##0.00';
-            ws2.addRow([]);
-        });
-
-        const ws3 = wb.addWorksheet("Rentabilidad");
-        ws3.columns = [{ width: 12 }, { width: 15 }, { width: 18 }, { width: 18 }, { width: 20 }, { width: 22 }, { width: 22 }, { width: 20 }, { width: 20 }, { width: 22 }];
-        ws3.mergeCells('A1:J1');
-        ws3.getCell('A1').value = 'Control de Ganancias por Producción';
-        ws3.getCell('A1').font = { size: 14, bold: true };
-        ws3.getCell('A1').alignment = center;
-        ws3.addRow([]);
-
-        let rH3 = ws3.addRow(['Fecha', 'Tasa USD', 'Total Gastos (Bs)', 'Total Gastos ($)', 'Pastichos Producidos', 'Venta Pastichos ($)', 'Ingreso Delivery (Bs)', 'Delivery en USD ($)', 'Total Ingresos ($)', 'GANANCIA NETA ($)']);
-        rH3.eachCell((c, i) => { c.font = textWhite; c.alignment = center; c.fill = (i <= 4) ? headerBlue : headerGreen; });
-
-        let sGas = 0, sIng = 0, sGan = 0;
-        dbHistorial.forEach(reg => {
-            let cant = reg.cantP || 10; let pre = reg.precioP || 10; let delBs = reg.deliveryBs || 0;
-            let row = ws3.addRow([reg.fecha, reg.tasa, reg.totalGastosBs, reg.totalGastosUSD, cant, (cant*pre), delBs, (delBs/reg.tasa), reg.ingresosUSD, reg.gananciaUSD]);
-            
-            row.getCell(2).numFmt = '#,##0.00'; row.getCell(3).numFmt = '#,##0.00 "Bs"'; row.getCell(4).numFmt = '"$"#,##0.00';
-            row.getCell(6).numFmt = '"$"#,##0.00'; row.getCell(7).numFmt = '#,##0.00 "Bs"'; row.getCell(8).numFmt = '"$"#,##0.00';
-            row.getCell(9).numFmt = '"$"#,##0.00'; row.getCell(10).numFmt = '"$"#,##0.00';
-            row.getCell(10).font = textBlueGanancia;
-
-            sGas += reg.totalGastosUSD; sIng += reg.ingresosUSD; sGan += reg.gananciaUSD;
-        });
-
-        let rT3 = ws3.addRow(['', '', 'TOTALES ACUMULADOS', sGas, '', '', '', '', sIng, sGan]);
-        rT3.eachCell(c => c.font = { bold: true });
-        rT3.getCell(4).numFmt = '"$"#,##0.00'; rT3.getCell(9).numFmt = '"$"#,##0.00'; rT3.getCell(10).numFmt = '"$"#,##0.00';
-        rT3.getCell(10).font = textBlueGanancia;
-
-        const ws4 = wb.addWorksheet("Matriz de Ingredientes");
-        let setIng = new Set();
-        dbHistorial.forEach(r => { r.factura.forEach(i => setIng.add(i.nombre)); r.adicionales.forEach(i => setIng.add(i.nombre)); });
-        
-        let cols4 = [{ width: 25 }]; dbHistorial.forEach(() => cols4.push({ width: 15 }));
-        ws4.columns = cols4;
-
-        ws4.mergeCells(1, 1, 1, 1 + dbHistorial.length);
-        ws4.getCell('A1').value = 'Comparativa de Ingredientes Comprados por Día';
-        ws4.getCell('A1').font = { size: 14, bold: true };
-        ws4.getCell('A1').alignment = center;
-        ws4.addRow([]);
-
-        let headerMatriz = ['Ingrediente']; dbHistorial.forEach(r => headerMatriz.push(r.fecha));
-        let rH4 = ws4.addRow(headerMatriz);
-        rH4.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
-
-        Array.from(setIng).forEach(ing => {
-            let fila = [ing];
-            dbHistorial.forEach(r => {
-                let existe = r.factura.some(i => i.nombre === ing) || r.adicionales.some(i => i.nombre === ing);
-                fila.push(existe ? 'Sí' : 'No');
-            });
-            
-            let rM = ws4.addRow(fila);
-            rM.getCell(1).font = { bold: true };
-            rM.eachCell((c, i) => {
-                if (i > 1) {
-                    c.alignment = center;
-                    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: (c.value === 'Sí') ? 'FFD9EAD3' : 'FFF4CCCC' } }; 
-                }
-            });
+            let row = ws1.addRow([reg.fecha, reg.tasa, reg.factura.reduce((s, i) => s + i.bs, 0), reg.adicionales.reduce((s, i) => s + i.bs, 0), reg.totalGastosBs, reg.totalGastosUSD]);
+            row.getCell(2).numFmt = '#,##0.00 "Bs"'; row.getCell(5).numFmt = '#,##0.00 "Bs"'; row.getCell(6).numFmt = '"$"#,##0.00';
         });
 
         const buffer = await wb.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        saveAs(blob, "Control_Gastos_Pastichos_Elegante.xlsx");
+        saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos.xlsx");
     }
-
-    function cambiarPestana(id) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    window.onload = cargarListas;
 </script>
 </body>
 </html>
