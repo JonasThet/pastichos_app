@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pastichos">
     
-    <title>App Pastichos 15.0</title>
+    <title>App Pastichos 16</title>
     
     <!-- LIBRERÍAS DE FIREBASE (El Cerebro) -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -28,8 +28,9 @@
         .nube-status { font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; }
         .dot { height: 10px; width: 10px; background-color: #2ecc71; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #2ecc71; }
 
-        .tabs { display: flex; background: #34495e; overflow-x: auto; white-space: nowrap; }
-        .tab-btn { flex: 1; padding: 15px; text-align: center; color: white; background: none; border: none; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .tabs { display: flex; background: #34495e; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { flex: 1; min-width: 120px; padding: 15px 5px; text-align: center; color: white; background: none; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .tab-btn:hover { background: rgba(255,255,255,0.1); }
         .tab-btn.active { background: var(--accent); }
         .tab-content { display: none; padding: 30px; }
@@ -39,7 +40,7 @@
         .seccion h3 { color: var(--secondary); border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-top: 0; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .fila { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
-        .campo { display: flex; flex-direction: column; flex: 1; min-width: 150px; position: relative; }
+        .campo { display: flex; flex-direction: column; flex: 1; min-width: 130px; position: relative; }
         label { font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; }
         input { padding: 10px; border: 1px solid #ccd1d9; border-radius: 6px; font-size: 16px; transition: border 0.3s; }
         input:focus { border-color: var(--secondary); outline: none; }
@@ -50,14 +51,14 @@
         .btn-mic:hover { background: #732d91; transform: translateY(-2px); }
         .mic-status { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; border: 1px solid #c3e6cb; margin-bottom: 20px; display: none; font-weight: bold; text-align: center; font-size: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); white-space: pre-line; }
 
-        .ingrediente-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; transition: 0.2s; }
+        .ingrediente-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; transition: 0.2s; }
         .ingrediente-row:hover { background: #f9f9f9; border-color: #ccc; }
         .ingreso-wrapper { display: flex; align-items: center; gap: 10px; }
         .monto-input { width: 130px; text-align: right; font-weight: bold; color: #2c3e50; }
         
         .btn { border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
         .btn-add { background: #3498db; font-size: 14px; margin-top: 10px; }
-        .btn-clear-all { background: var(--danger); }
+        .btn-clear-all { background: var(--danger); width: 100%; padding: 12px; }
         .btn-delete { background: #e74c3c; padding: 8px; border-radius: 50%; font-size: 12px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
         .btn-calcular { background: #e67e22; width: 100%; font-size: 20px; padding: 18px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(230,126,34,0.3); }
         .btn-excel { background: var(--accent); padding: 15px 25px; font-size: 16px; display: block; margin: 0 auto 10px auto; width: 100%; text-align: center; }
@@ -79,6 +80,9 @@
         .respaldo-bar { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-respaldo { background: #7f8c8d; flex: 1; }
 
+        .pedido-tachable { flex: 1; cursor: pointer; transition: 0.2s; font-size: 16px; user-select: none; }
+        .pedido-tachable:active { opacity: 0.5; }
+
         @media (max-width: 768px) {
             body { padding: 0; background-color: white; } 
             .container { border-radius: 0; box-shadow: none; max-width: 100%; }
@@ -87,7 +91,6 @@
             .tab-btn { font-size: 13px; padding: 12px 5px; }
             .tab-content { padding: 15px; }
             .top-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-            .btn-clear-all { width: 100%; padding: 12px; }
             .fila { flex-direction: column; gap: 12px; }
             .campo { width: 100%; }
             .ingrediente-row { flex-direction: column; align-items: stretch; gap: 8px; padding: 15px; }
@@ -105,14 +108,15 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 15.0</h1>
+        <h1>🍕 App Pastichos 16</h1>
         <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
     <div class="tabs">
         <button class="tab-btn active" onclick="cambiarPestana('registro')">📝 Registro</button>
+        <button class="tab-btn" onclick="cambiarPestana('monitor')">📋 Monitor</button>
         <button class="tab-btn" onclick="cambiarPestana('historial')">🗄️ Historial</button>
-        <button class="tab-btn" onclick="cambiarPestana('facturacion')">🧾 Facturar a Cliente</button>
+        <button class="tab-btn" onclick="cambiarPestana('facturacion')">🧾 Facturar</button>
     </div>
 
     <!-- PESTAÑA 1: REGISTRO -->
@@ -122,7 +126,7 @@
 
         <div class="top-bar">
             <h2 style="color: #2c3e50; margin:0;">Registro de Inversión</h2>
-            <button class="btn btn-clear-all" onclick="limpiarTodo()">🧹 Limpiar Precios</button>
+            <button class="btn" style="background:var(--danger); padding:10px;" onclick="limpiarTodo()">🧹 Limpiar Precios</button>
         </div>
 
         <div class="seccion">
@@ -161,18 +165,43 @@
         <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 GUARDAR EN LA NUBE</button>
     </div>
 
-    <!-- PESTAÑA 2: HISTORIAL -->
+    <!-- PESTAÑA 2: MONITOR DE PEDIDOS -->
+    <div id="monitor" class="tab-content">
+        <div class="seccion">
+            <h3>📋 Preventa y Reservas (Próximo Lote)</h3>
+            
+            <div style="background: #ebf5fb; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d6eaf8; margin-bottom: 20px;">
+                <span style="font-size: 18px; color: #2c3e50;">Total Pastichos Reservados:</span><br>
+                <span id="total-reservados" style="font-size: 32px; font-weight: bold; color: var(--secondary);">0</span>
+            </div>
+
+            <div class="fila" style="align-items: flex-end;">
+                <div class="campo" style="flex: 2;"><label>Nombre del Cliente:</label><input type="text" id="mon-cliente" placeholder="Ej: Scarlit Sánchez"></div>
+                <div class="campo" style="flex: 1;"><label>Cantidad:</label><input type="number" id="mon-cant" value="1" min="1"></div>
+                <div class="campo" style="flex: 1;"><button class="btn btn-add" style="margin:0; padding:12px; height: 44px;" onclick="agregarPedido()">➕ Anotar</button></div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h4 style="color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Lista de Clientes (Toca para tachar al entregar)</h4>
+                <div id="lista-pedidos"></div>
+            </div>
+
+            <button class="btn btn-clear-all" onclick="limpiarPedidos()" style="margin-top: 30px;">🗑️ BORRAR LISTA PARA NUEVO LOTE</button>
+        </div>
+    </div>
+
+    <!-- PESTAÑA 3: HISTORIAL -->
     <div id="historial" class="tab-content">
         <div class="respaldo-bar">
-            <button class="btn btn-respaldo" onclick="exportarBaseDatos()">💾 Bajar Datos a PC (Backup)</button>
-            <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Subir Datos (Migrar a Nube)</button>
+            <button class="btn btn-respaldo" onclick="exportarBaseDatos()">💾 Bajar Datos (Backup)</button>
+            <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Subir Datos</button>
             <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarBaseDatos(event)">
         </div>
         <button class="btn btn-excel" onclick="exportarExcel()">📥 DESCARGAR EXCEL ELEGANTE (.xlsx)</button>
         <div id="contenedor-historial"></div>
     </div>
 
-    <!-- PESTAÑA 3: FACTURACIÓN -->
+    <!-- PESTAÑA 4: FACTURACIÓN -->
     <div id="facturacion" class="tab-content">
         <div class="seccion">
             <h3>🧾 Generar Recibo de Compra</h3>
@@ -217,22 +246,23 @@
     const fAdicionalesBase = ["Carne molida", "Pan Campesino", "Nuez Moscada", "Aliños (Tomate/Cebolla/etc)"];
     
     let dbHistorial = [];
+    let dbPedidos = [];
     let dbTasas = JSON.parse(localStorage.getItem('tasasBCV_Memoria')) || {};
 
+    // Sincronización del Historial
     database.ref('historial').on('value', (snapshot) => {
         const data = snapshot.val();
-        if (data) {
-            dbHistorial = Object.values(data).sort((a, b) => a.id - b.id);
-        } else {
-            dbHistorial = [];
-            let localBackup = JSON.parse(localStorage.getItem('pastichosDB'));
-            if (localBackup && localBackup.length > 0) {
-                localBackup.forEach(reg => database.ref('historial/' + reg.id).set(reg));
-                localStorage.removeItem('pastichosDB'); 
-                alert("☁️ ¡Migración Exitosa! Se detectaron registros viejos y fueron subidos a la Nube.");
-            }
-        }
+        if (data) dbHistorial = Object.values(data).sort((a, b) => a.id - b.id);
+        else dbHistorial = [];
         renderizarHistorial(); 
+    });
+
+    // Sincronización del Monitor de Pedidos
+    database.ref('pedidos').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) dbPedidos = Object.values(data).sort((a, b) => a.id - b.id);
+        else dbPedidos = [];
+        renderizarPedidos();
     });
 
     function cambiarPestana(id) {
@@ -240,42 +270,80 @@
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         event.currentTarget.classList.add('active');
-        if(id === 'facturacion') {
-            document.getElementById('fac-tasa').value = document.getElementById('tasa').value;
+        if(id === 'facturacion') document.getElementById('fac-tasa').value = document.getElementById('tasa').value;
+    }
+
+    function obtenerFechaLocal() { return (new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000))).toISOString().split('T')[0]; }
+    function floatAFormatoMoneda(num) {
+        let parts = (Math.round(num * 100) / 100).toFixed(2).split('.');
+        if (!parts[1]) parts[1] = "00"; else if (parts[1].length === 1) parts[1] += "0";
+        return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + parts[1];
+    }
+    function parsearMoneda(valorString) { return parseFloat((valorString || "").replace(/\./g, '').replace(',', '.')) || 0; }
+    function formatearMoneda(e) {
+        let val = e.target.value.replace(/\D/g, ''); if (val === '') { e.target.value = ''; return; }
+        e.target.value = Math.floor(parseInt(val, 10) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + (parseInt(val, 10) % 100).toString().padStart(2, '0');
+    }
+
+    // --- LOGICA DEL MONITOR DE PEDIDOS ---
+    function agregarPedido() {
+        let clienteInput = document.getElementById('mon-cliente');
+        let cantInput = document.getElementById('mon-cant');
+        let nombre = clienteInput.value.trim();
+        let cant = parseInt(cantInput.value) || 1;
+        
+        if(nombre === "") { alert("Por favor ingresa el nombre del cliente."); return; }
+        
+        let nuevoPedido = { id: Date.now(), cliente: nombre, cantidad: cant, entregado: false };
+        database.ref('pedidos/' + nuevoPedido.id).set(nuevoPedido);
+        
+        clienteInput.value = ""; cantInput.value = "1";
+        clienteInput.focus();
+    }
+
+    function togglePedido(id, estadoActual) {
+        database.ref('pedidos/' + id).update({ entregado: !estadoActual });
+    }
+
+    function borrarPedido(id) {
+        if(confirm("¿Eliminar a este cliente de la lista?")) { database.ref('pedidos/' + id).remove(); }
+    }
+
+    function limpiarPedidos() {
+        if(confirm("⚠️ ¿Estás seguro que quieres vaciar toda la lista? Haz esto solo cuando vayas a empezar a vender el lote de la siguiente semana.")) {
+            database.ref('pedidos').remove();
         }
     }
 
-    function obtenerFechaLocal() {
-        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
-        return (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
+    function renderizarPedidos() {
+        const div = document.getElementById('lista-pedidos');
+        div.innerHTML = "";
+        let totalReservados = 0;
+
+        if (dbPedidos.length === 0) {
+            div.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-style:italic;'>No hay preventas registradas para este lote.</p>";
+        } else {
+            dbPedidos.forEach(p => {
+                totalReservados += p.cantidad;
+                let bgStyle = p.entregado ? 'background: #d4edda; border-color: #c3e6cb;' : 'background: white;';
+                let textStyle = p.entregado ? 'text-decoration: line-through; color: #6c757d;' : 'color: #2c3e50;';
+                let icon = p.entregado ? '✅' : '📦';
+                
+                div.innerHTML += `
+                    <div class="ingrediente-row" style="${bgStyle} align-items: center; display: flex; flex-direction: row; gap: 10px;">
+                        <div class="pedido-tachable" style="${textStyle}" onclick="togglePedido(${p.id}, ${p.entregado})">
+                            <strong style="display:block; font-size:18px;">${icon} ${p.cliente}</strong>
+                            <span style="font-size:14px; margin-left:28px;">Solicitó: <b>${p.cantidad}</b> pasticho(s)</span>
+                        </div>
+                        <button class="btn btn-delete" onclick="borrarPedido(${p.id})">❌</button>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('total-reservados').innerText = totalReservados;
     }
 
-    function floatAFormatoMoneda(num) {
-        let rounded = Math.round(num * 100) / 100;
-        let parts = rounded.toFixed(2).split('.');
-        if (!parts[1]) parts[1] = "00";
-        else if (parts[1].length === 1) parts[1] += "0";
-        let integers = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return integers + ',' + parts[1];
-    }
-
-    function parsearMoneda(valorString) {
-        if (!valorString) return 0;
-        let numero = valorString.replace(/\./g, '').replace(',', '.');
-        return parseFloat(numero) || 0;
-    }
-
-    function formatearMoneda(e) {
-        let input = e.target;
-        let valor = input.value.replace(/\D/g, '');
-        if (valor === '') { input.value = ''; return; }
-        let num = parseInt(valor, 10);
-        let cents = (num % 100).toString().padStart(2, '0');
-        let integers = Math.floor(num / 100).toString();
-        integers = integers.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        input.value = integers + ',' + cents;
-    }
-
+    // --- LOGICA DE FACTURACIÓN ---
     function generarReciboWA() {
         let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente";
         let cant = parseInt(document.getElementById('fac-cant').value) || 1;
@@ -285,477 +353,169 @@
 
         if(tasa <= 0) { alert("Debes ingresar la tasa BCV para calcular en Bolívares."); return; }
 
-        let totalUSD_crudo = (cant * precioUSD) + (deliveryBs / tasa);
-        let totalUSD_redondeado = Math.round(totalUSD_crudo * 100) / 100;
+        let totalUSD_redondeado = Math.round(((cant * precioUSD) + (deliveryBs / tasa)) * 100) / 100;
         let totalBs = totalUSD_redondeado * tasa;
 
-        let mensaje = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n`;
-        mensaje += `👤 *Cliente:* ${cliente}\n`;
-        mensaje += `📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precioUSD)}\n`;
+        let mensaje = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n👤 *Cliente:* ${cliente}\n📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precioUSD)}\n`;
         if(deliveryBs > 0) mensaje += `🛵 *Delivery:* ${floatAFormatoMoneda(deliveryBs)} Bs\n`;
-        mensaje += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD_redondeado)}*\n`;
-        mensaje += `🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n`;
-        mensaje += `_(Calculado a Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n`;
-        mensaje += `¡Gracias por preferirnos! 🍕\n\n`;
-        mensaje += `💳 *PAGO MÓVIL BANESCO* 👇\n`;
-        mensaje += `0134 04248536405 31074703`;
+        mensaje += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD_redondeado)}*\n🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n_(Calculado a Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n¡Gracias por preferirnos! 🍕\n\n💳 *PAGO MÓVIL BANESCO* 👇\n0134 04248536405 31074703`;
 
-        let url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
-        window.open(url, '_blank');
+        window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
     }
 
-    function exportarBaseDatos() {
-        let data = { historial: dbHistorial, tasas: dbTasas };
-        let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-        saveAs(blob, "Respaldo_Pastichos_Nube.json");
-    }
-
+    // --- RESPALDO ---
+    function exportarBaseDatos() { saveAs(new Blob([JSON.stringify({ historial: dbHistorial, tasas: dbTasas })], { type: "application/json" }), "Respaldo_Pastichos.json"); }
     function importarBaseDatos(event) {
-        let file = event.target.files[0];
-        if (!file) return;
         let reader = new FileReader();
         reader.onload = function(e) {
             try {
                 let data = JSON.parse(e.target.result);
-                if (data.historial) {
-                    data.historial.forEach(reg => database.ref('historial/' + reg.id).set(reg));
-                    alert("¡Los registros del archivo fueron subidos a la Nube con éxito!");
-                }
-                if (data.tasas) {
-                    localStorage.setItem('tasasBCV_Memoria', JSON.stringify(data.tasas));
-                    dbTasas = data.tasas;
-                }
+                if (data.historial) data.historial.forEach(reg => database.ref('historial/' + reg.id).set(reg));
+                if (data.tasas) { localStorage.setItem('tasasBCV_Memoria', JSON.stringify(data.tasas)); dbTasas = data.tasas; }
+                alert("¡Datos subidos a la Nube con éxito!");
             } catch (err) { alert("Error al leer el archivo."); }
         };
-        reader.readAsText(file);
+        if(event.target.files[0]) reader.readAsText(event.target.files[0]);
     }
 
+    // --- LOGICA FORMULARIO INGREDIENTES ---
     function crearFilaHTML(nombre, esFijo, idUnico) {
         let esIva = (nombre === "I.V.A. (16%)");
-        let extraStyle = esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : "";
-        let labelColor = esIva ? "color: #856404; font-weight: bold;" : "";
-        return `
-            <div class="ingrediente-row" id="row-${idUnico}" style="${extraStyle}">
-                <label style="${labelColor}">${esIva ? '🧾 ' : ''}${nombre}</label>
-                <div class="ingreso-wrapper">
-                    <input type="text" class="monto-input" data-nombre="${nombre}" data-tipo="${esFijo ? 'fijo' : 'nuevo'}" oninput="formatearMoneda(event)" placeholder="0,00">
-                    <button class="btn btn-delete" onclick="borrarFila('row-${idUnico}', ${esFijo})" title="Borrar">❌</button>
-                </div>
+        return `<div class="ingrediente-row" id="row-${idUnico}" style="${esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : ""}">
+            <label style="${esIva ? "color: #856404; font-weight: bold;" : ""}">${esIva ? '🧾 ' : ''}${nombre}</label>
+            <div class="ingreso-wrapper">
+                <input type="text" class="monto-input" data-nombre="${nombre}" data-tipo="${esFijo ? 'fijo' : 'nuevo'}" oninput="formatearMoneda(event)" placeholder="0,00">
+                <button class="btn btn-delete" onclick="borrarFila('row-${idUnico}', ${esFijo})" title="Borrar">❌</button>
             </div>
-        `;
+        </div>`;
     }
 
     function cargarListasLimpias() {
-        document.getElementById('lista-factura').innerHTML = "";
-        document.getElementById('lista-adicionales').innerHTML = "";
+        document.getElementById('lista-factura').innerHTML = ""; document.getElementById('lista-adicionales').innerHTML = "";
         fFacturaBase.forEach((ing, i) => document.getElementById('lista-factura').innerHTML += crearFilaHTML(ing, true, 'F'+i));
         fAdicionalesBase.forEach((ing, i) => document.getElementById('lista-adicionales').innerHTML += crearFilaHTML(ing, true, 'A'+i));
     }
 
     window.onload = () => {
         cargarListasLimpias();
-        let fechaInput = document.getElementById('fecha');
-        fechaInput.value = obtenerFechaLocal();
-        fechaInput.addEventListener('change', buscarTasa);
+        document.getElementById('fecha').value = obtenerFechaLocal();
+        document.getElementById('fecha').addEventListener('change', buscarTasa);
         buscarTasa(); 
     };
 
     async function buscarTasa() {
-        let inputFecha = document.getElementById('fecha').value;
-        let inputTasa = document.getElementById('tasa');
-        let indicador = document.getElementById('indicador-tasa');
-        
-        if (!inputFecha) return;
-        indicador.style.display = 'none';
-
-        if (inputFecha === obtenerFechaLocal()) {
-            inputTasa.placeholder = "Buscando BCV...";
-            inputTasa.value = "";
-            try {
-                let res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
-                let data = await res.json();
-                if (data.promedio) {
-                    inputTasa.value = floatAFormatoMoneda(data.promedio);
-                    indicador.innerText = "✓ BCV Oficial (En vivo)";
-                    indicador.style.display = 'block'; return;
-                }
-            } catch(e) { inputTasa.placeholder = "0,00"; }
+        let iF = document.getElementById('fecha').value, iT = document.getElementById('tasa'), ind = document.getElementById('indicador-tasa');
+        if (!iF) return; ind.style.display = 'none';
+        if (iF === obtenerFechaLocal()) {
+            iT.placeholder = "Buscando..."; iT.value = "";
+            try { let res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial'); let data = await res.json();
+                if (data.promedio) { iT.value = floatAFormatoMoneda(data.promedio); ind.innerText = "✓ BCV Oficial (En vivo)"; ind.style.display = 'block'; return; }
+            } catch(e) { iT.placeholder = "0,00"; }
         } 
-        
-        if (dbTasas[inputFecha]) {
-            inputTasa.value = floatAFormatoMoneda(dbTasas[inputFecha]);
-            indicador.innerText = "✓ Tasa en Memoria";
-            indicador.style.display = 'block'; return;
-        }
-        inputTasa.value = ""; inputTasa.placeholder = "0,00";
+        if (dbTasas[iF]) { iT.value = floatAFormatoMoneda(dbTasas[iF]); ind.innerText = "✓ Tasa en Memoria"; ind.style.display = 'block'; return; }
+        iT.value = ""; iT.placeholder = "0,00";
     }
 
-    function agregarItem(idContenedor, esFijo) {
-        let nombre = prompt("Nombre del nuevo artículo/gasto:");
-        if (nombre && nombre.trim() !== "") {
-            let idUnico = 'Nuevo' + Math.floor(Math.random() * 10000);
-            document.getElementById(idContenedor).insertAdjacentHTML('beforeend', crearFilaHTML(nombre, esFijo, idUnico));
-        }
-    }
-
-    function borrarFila(idRow, esFijo) {
-        if (esFijo) document.querySelector(`#${idRow} input`).value = "";
-        else document.getElementById(idRow).remove();
-    }
-
-    function limpiarTodo() {
-        if(confirm("¿Seguro que quieres borrar todos los precios ingresados?")) {
-            document.querySelectorAll('.monto-input, #deliveryBs').forEach(i => i.value = "");
-            document.getElementById('cantPastichos').value = "10";
-            document.getElementById('precioPasticho').value = "10,00";
-            buscarTasa();
-        }
-    }
+    function agregarItem(id, esFijo) { let n = prompt("Nombre:"); if (n && n.trim()) document.getElementById(id).insertAdjacentHTML('beforeend', crearFilaHTML(n, esFijo, 'N'+Date.now())); }
+    function borrarFila(id, esFijo) { if (esFijo) document.querySelector(`#${id} input`).value = ""; else document.getElementById(id).remove(); }
+    function limpiarTodo() { if(confirm("¿Borrar precios ingresados?")) { document.querySelectorAll('.monto-input, #deliveryBs').forEach(i => i.value = ""); buscarTasa(); } }
 
     function editarRegistroHistorial(id) {
-        let reg = dbHistorial.find(r => r.id === id);
-        if(!reg) return;
-        if(!confirm("Se devolverán los datos para corregirlos. Al guardar, se actualizará en la Nube. ¿Continuar?")) return;
-
-        document.getElementById('fecha').value = reg.fecha;
-        document.getElementById('tasa').value = floatAFormatoMoneda(reg.tasa);
-        document.getElementById('cantPastichos').value = reg.cantP || 10;
-        document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 10);
-        document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
-
+        let reg = dbHistorial.find(r => r.id === id); if(!reg || !confirm("Devolver datos para corregir. ¿Continuar?")) return;
+        document.getElementById('fecha').value = reg.fecha; document.getElementById('tasa').value = floatAFormatoMoneda(reg.tasa);
+        document.getElementById('cantPastichos').value = reg.cantP || 10; document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 10); document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
         cargarListasLimpias(); 
-
-        let poblarLista = (listaGuardada, contenedorId) => {
-            listaGuardada.forEach(item => {
-                let input = document.querySelector(`#${contenedorId} input[data-nombre="${item.nombre}"]`);
-                if(!input) {
-                    let idUnico = 'Nuevo' + Math.floor(Math.random() * 10000);
-                    document.getElementById(contenedorId).insertAdjacentHTML('beforeend', crearFilaHTML(item.nombre, false, idUnico));
-                    input = document.querySelector(`#row-${idUnico} input`);
-                }
-                input.value = Math.round(item.bs * 100).toString();
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-            });
-        };
-
-        poblarLista(reg.factura, 'lista-factura');
-        poblarLista(reg.adicionales, 'lista-adicionales');
-
-        database.ref('historial/' + id).remove();
-        
-        cambiarPestana('registro');
-        window.scrollTo(0,0);
+        let poblar = (lista, cont) => { lista.forEach(i => {
+            let input = document.querySelector(`#${cont} input[data-nombre="${i.nombre}"]`);
+            if(!input) { document.getElementById(cont).insertAdjacentHTML('beforeend', crearFilaHTML(i.nombre, false, 'N'+Math.random())); input = document.querySelector(`#${cont} input[data-nombre="${i.nombre}"]`); }
+            input.value = Math.round(i.bs * 100).toString(); input.dispatchEvent(new Event('input', { bubbles: true }));
+        });};
+        poblar(reg.factura, 'lista-factura'); poblar(reg.adicionales, 'lista-adicionales');
+        database.ref('historial/' + id).remove(); cambiarPestana('registro'); window.scrollTo(0,0);
     }
-
-    function borrarRegistroHistorial(id) {
-        if(confirm("¿Estás seguro de eliminar este registro permanentemente de la Nube? Todos los dispositivos lo perderán.")) {
-            database.ref('historial/' + id).remove();
-        }
-    }
+    function borrarRegistroHistorial(id) { if(confirm("¿Eliminar registro de la Nube?")) database.ref('historial/' + id).remove(); }
 
     function calcularYGuardar() {
-        let fecha = document.getElementById('fecha').value;
-        let tasa = parsearMoneda(document.getElementById('tasa').value);
-        if (tasa <= 0) { alert("¡Falta la tasa del dólar!"); return; }
-
-        let detallesFactura = []; let detallesAdicionales = [];
-        let totalBsF = 0; let totalBsA = 0;
-
-        document.querySelectorAll('#lista-factura .monto-input').forEach(input => {
-            let val = parsearMoneda(input.value);
-            if (val > 0) { detallesFactura.push({ nombre: input.dataset.nombre, bs: val }); totalBsF += val; }
-        });
-        document.querySelectorAll('#lista-adicionales .monto-input').forEach(input => {
-            let val = parsearMoneda(input.value);
-            if (val > 0) { detallesAdicionales.push({ nombre: input.dataset.nombre, bs: val }); totalBsA += val; }
-        });
-
-        if(totalBsF === 0 && totalBsA === 0) { alert("No has ingresado ningún gasto."); return; }
-
-        let cantP = parseFloat(document.getElementById('cantPastichos').value) || 0;
-        let precioP = parsearMoneda(document.getElementById('precioPasticho').value);
-        let deliveryBs = parsearMoneda(document.getElementById('deliveryBs').value);
-
-        let totalGastosBs = totalBsF + totalBsA;
-        let totalGastosUSD = totalGastosBs / tasa;
-        let ingresosUSD = (cantP * precioP) + (deliveryBs / tasa);
-        let gananciaUSD = ingresosUSD - totalGastosUSD;
-
+        let fecha = document.getElementById('fecha').value, tasa = parsearMoneda(document.getElementById('tasa').value);
+        if (tasa <= 0) { alert("¡Falta la tasa!"); return; }
+        let dF = [], dA = [], tF = 0, tA = 0;
+        document.querySelectorAll('#lista-factura .monto-input').forEach(i => { let v = parsearMoneda(i.value); if (v > 0) { dF.push({ nombre: i.dataset.nombre, bs: v }); tF += v; } });
+        document.querySelectorAll('#lista-adicionales .monto-input').forEach(i => { let v = parsearMoneda(i.value); if (v > 0) { dA.push({ nombre: i.dataset.nombre, bs: v }); tA += v; } });
+        if(tF === 0 && tA === 0) { alert("No hay gastos."); return; }
+        let cP = parseFloat(document.getElementById('cantPastichos').value) || 0, pP = parsearMoneda(document.getElementById('precioPasticho').value), dB = parsearMoneda(document.getElementById('deliveryBs').value);
+        let gUSD = ((cP * pP) + (dB / tasa)) - ((tF + tA) / tasa);
         dbTasas[fecha] = tasa; localStorage.setItem('tasasBCV_Memoria', JSON.stringify(dbTasas));
-
-        let registro = {
-            id: Date.now(), fecha: fecha, tasa: tasa, 
-            factura: detallesFactura, adicionales: detallesAdicionales,
-            totalGastosBs: totalGastosBs, totalGastosUSD: totalGastosUSD,
-            cantP: cantP, precioP: precioP, deliveryBs: deliveryBs,
-            ingresosUSD: ingresosUSD, gananciaUSD: gananciaUSD
-        };
-
-        database.ref('historial/' + registro.id).set(registro);
-        
-        alert(`☁️ ¡Enviado a la Nube con éxito!\nGanancia neta: $${gananciaUSD.toFixed(2)}`);
-        limpiarTodo(); cargarListasLimpias(); cambiarPestana('historial');
+        database.ref('historial/' + Date.now()).set({ id: Date.now(), fecha: fecha, tasa: tasa, factura: dF, adicionales: dA, totalGastosBs: (tF + tA), totalGastosUSD: ((tF + tA) / tasa), cantP: cP, precioP: pP, deliveryBs: dB, ingresosUSD: ((cP * pP) + (dB / tasa)), gananciaUSD: gUSD });
+        alert(`☁️ ¡Enviado a la Nube!\nGanancia: $${gUSD.toFixed(2)}`); limpiarTodo(); cargarListasLimpias(); cambiarPestana('historial');
     }
 
     function renderizarHistorial() {
-        const divH = document.getElementById('contenedor-historial');
-        divH.innerHTML = "";
+        const divH = document.getElementById('contenedor-historial'); divH.innerHTML = "";
         if (dbHistorial.length === 0) { divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>La Nube está vacía.</h3>"; return; }
-
-        let dbReverse = [...dbHistorial].reverse();
-        dbReverse.forEach(reg => {
-            let htmlFactura = `<div class="detalles-box"><strong>🧾 Factura Principal</strong><br>`;
-            reg.factura.forEach(f => {
-                let style = (f.nombre === "I.V.A. (16%)") ? 'font-weight: bold; color: #856404; background: #fff3cd; padding: 2px 5px; border-radius: 4px;' : '';
-                htmlFactura += `<div class="item-line" style="${style}"><span>${f.nombre}</span> <span>${f.bs.toLocaleString('es-VE')} Bs</span></div>`;
-            }); htmlFactura += `</div>`;
-
-            let htmlAdic = `<div class="detalles-box"><strong>➕ Gastos Adicionales</strong><br>`;
-            reg.adicionales.forEach(a => htmlAdic += `<div class="item-line"><span>${a.nombre}</span> <span>${a.bs.toLocaleString('es-VE')} Bs</span></div>`);
-            htmlAdic += `</div>`;
-
-            divH.innerHTML += `
-                <div class="factura-card">
-                    <div class="factura-header">
-                        <span class="factura-title">📅 ${reg.fecha}</span>
-                        <div class="header-right">
-                            <span style="font-weight:bold;">Tasa: ${reg.tasa.toLocaleString('es-VE')} Bs</span>
-                            <button class="btn btn-editar-historial" onclick="editarRegistroHistorial(${reg.id})">✏️ Editar</button>
-                            <button class="btn btn-eliminar-historial" onclick="borrarRegistroHistorial(${reg.id})">❌ Borrar</button>
-                        </div>
-                    </div>
-                    <div class="factura-details">${htmlFactura}${htmlAdic}
-                        <div class="totales-box">
-                            <strong>📊 Resumen del Lote</strong>
-                            <div style="margin-top:10px;">Inversión: $${reg.totalGastosUSD.toFixed(2)}</div>
-                            <div>Ingresos: $${reg.ingresosUSD.toFixed(2)}</div>
-                            <div class="ganancia-text">Ganancia: $${reg.gananciaUSD.toFixed(2)}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        [...dbHistorial].reverse().forEach(r => {
+            let hF = `<div class="detalles-box"><strong>🧾 Factura Principal</strong><br>`, hA = `<div class="detalles-box"><strong>➕ Gastos Adicionales</strong><br>`;
+            r.factura.forEach(f => hF += `<div class="item-line" ${f.nombre==="I.V.A. (16%)"?'style="font-weight:bold;color:#856404;background:#fff3cd;"':''}><span>${f.nombre}</span> <span>${f.bs.toLocaleString('es-VE')} Bs</span></div>`); hF += `</div>`;
+            r.adicionales.forEach(a => hA += `<div class="item-line"><span>${a.nombre}</span> <span>${a.bs.toLocaleString('es-VE')} Bs</span></div>`); hA += `</div>`;
+            divH.innerHTML += `<div class="factura-card"><div class="factura-header"><span class="factura-title">📅 ${r.fecha}</span><div class="header-right"><span style="font-weight:bold;">Tasa: ${r.tasa.toLocaleString('es-VE')} Bs</span><button class="btn btn-editar-historial" onclick="editarRegistroHistorial(${r.id})">✏️ Editar</button><button class="btn btn-eliminar-historial" onclick="borrarRegistroHistorial(${r.id})">❌ Borrar</button></div></div><div class="factura-details">${hF}${hA}<div class="totales-box"><strong>📊 Resumen</strong><div style="margin-top:10px;">Inversión: $${r.totalGastosUSD.toFixed(2)}</div><div>Ingresos: $${r.ingresosUSD.toFixed(2)}</div><div class="ganancia-text">Ganancia: $${r.gananciaUSD.toFixed(2)}</div></div></div></div>`;
         });
     }
 
     // --- 🤖 MOTOR DE IA DE VOZ ---
-    let reconociendo = false;
-    let recognition;
+    let reconociendo = false, recognition;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = 'es-VE'; recognition.continuous = true; recognition.interimResults = false;
-        
-        recognition.onstart = function() {
-            reconociendo = true;
-            document.getElementById('btn-microfono').innerHTML = "🔴 Escuchando... (Toca para detener)";
-            document.getElementById('btn-microfono').style.backgroundColor = "#c0392b";
-            mostrarMensajeMic("Micrófono abierto. Dicta de corrido.", "#d1ecf1", "#0c5460", "#bee5eb");
-        };
-        recognition.onresult = function(event) {
-            try {
-                let last = event.results.length - 1;
-                procesarDictadoMultiple(event.results[last][0].transcript.toLowerCase());
-            } catch (err) { console.error(err); }
-        };
-        recognition.onerror = function(event) {
-            if(event.error !== 'no-speech') mostrarMensajeMic("❌ Error al escuchar. Intenta de nuevo.", "#f8d7da", "#721c24", "#f5c6cb");
-        };
-        recognition.onend = function() {
-            reconociendo = false;
-            document.getElementById('btn-microfono').innerHTML = "🎙️ Iniciar Dictado Continuo";
-            document.getElementById('btn-microfono').style.backgroundColor = "var(--voice)";
-        };
-    }
-    function iniciarDictado() {
-        if (!recognition) { alert("Tu navegador actual no soporta dictado por voz."); return; }
-        if (reconociendo) recognition.stop(); else recognition.start();
-    }
-    function mostrarMensajeMic(texto, bg, color, border) {
-        let box = document.getElementById('mic-status');
-        box.innerText = texto; box.style.backgroundColor = bg; box.style.color = color; box.style.borderColor = border; box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 7000);
-    }
-    function procesarDictadoMultiple(frase) {
-        const mapa = [
-            { id: "Jamón", claves: ["jamón", "jamon"] }, { id: "Queso Mozarrella", claves: ["mozzarella", "mozarrela", "queso amarillo", "queso blanco", "queso"] },
-            { id: "Queso Parmesano", claves: ["parmesano", "queso rallado", "don pelayo"] }, { id: "Envases de Aluminio", claves: ["envase", "envases", "aluminio", "tapas"] },
-            { id: "Pasta de tomate", claves: ["pasta de tomate", "salsa de tomate", "salsa"] }, { id: "Pasta para pasticho", claves: ["pasta para pasticho", "láminas", "pasta capri", "capri"] },
-            { id: "Mantequilla Mavesa", claves: ["mantequilla", "mavesa", "margarina"] }, { id: "Cubitos Maggi", claves: ["cubito", "cubitos", "maggi", "caldo"] },
-            { id: "Leche", claves: ["leche", "litro de leche"] }, { id: "Cucharillas", claves: ["cucharilla", "cucharillas", "plástico"] },
-            { id: "I.V.A. (16%)", claves: ["iva", "impuesto"] }, { id: "Carne molida", claves: ["carne", "molida", "kilo de carne"] },
-            { id: "Pan Campesino", claves: ["pan", "campesino", "panadería"] }, { id: "Nuez Moscada", claves: ["nuez", "moscada", "especias"] },
-            { id: "Aliños (Tomate/Cebolla/etc)", claves: ["aliño", "aliños", "cebolla", "tomate", "zanahoria", "cilantro", "pimentón"] }
-        ];
-        let actualizados = [];
-        for (let item of mapa) {
-            for (let clave of item.claves) {
-                let index = frase.indexOf(clave);
-                if (index !== -1) {
-                    let restoFrase = frase.substring(index + clave.length);
-                    let match = restoFrase.match(/^[^\d]*(\d+(?:[.,]\d+)?|\d+\s*(?:con|coma|punto|y)\s*\d+)/);
-                    if (match) {
-                        let numLimpio = match[1].replace(/\s+(con|coma|punto|y)\s+/g, '.').replace(',', '.');
-                        let valFloat = parseFloat(numLimpio);
-                        if (!isNaN(valFloat)) {
-                            document.querySelectorAll('.monto-input').forEach(input => {
-                                if (input.dataset.nombre === item.id) {
-                                    input.value = Math.round(valFloat * 100).toString();
-                                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                                    actualizados.push(`${item.id}: ${input.value} Bs`);
-                                }
-                            });
-                        }
+        recognition.onstart = () => { reconociendo = true; document.getElementById('btn-microfono').innerHTML = "🔴 Escuchando..."; document.getElementById('btn-microfono').style.backgroundColor = "#c0392b"; };
+        recognition.onresult = (e) => {
+            let frase = e.results[e.results.length - 1][0].transcript.toLowerCase();
+            const mapa = [
+                { id: "Jamón", claves: ["jamón", "jamon"] }, { id: "Queso Mozarrella", claves: ["mozzarella", "mozarrela", "queso amarillo", "queso"] },
+                { id: "Queso Parmesano", claves: ["parmesano", "queso rallado"] }, { id: "Envases de Aluminio", claves: ["envase", "envases", "aluminio"] },
+                { id: "Pasta de tomate", claves: ["pasta de tomate", "salsa de tomate"] }, { id: "Pasta para pasticho", claves: ["pasta para pasticho", "láminas", "capri"] },
+                { id: "Mantequilla Mavesa", claves: ["mantequilla", "mavesa", "margarina"] }, { id: "Cubitos Maggi", claves: ["cubito", "cubitos", "maggi", "caldo"] },
+                { id: "Leche", claves: ["leche", "litro de leche"] }, { id: "Cucharillas", claves: ["cucharilla", "cucharillas", "plástico"] },
+                { id: "I.V.A. (16%)", claves: ["iva", "impuesto"] }, { id: "Carne molida", claves: ["carne", "molida"] },
+                { id: "Pan Campesino", claves: ["pan", "campesino", "panadería"] }, { id: "Nuez Moscada", claves: ["nuez", "moscada"] },
+                { id: "Aliños (Tomate/Cebolla/etc)", claves: ["aliño", "aliños", "cebolla", "tomate", "zanahoria", "cilantro", "pimentón"] }
+            ];
+            mapa.forEach(item => {
+                let match = item.claves.find(c => frase.includes(c));
+                if (match) {
+                    let num = frase.substring(frase.indexOf(match) + match.length).match(/^[^\d]*(\d+(?:[.,]\d+)?|\d+\s*(?:con|coma|punto|y)\s*\d+)/);
+                    if (num) {
+                        document.querySelectorAll('.monto-input').forEach(input => {
+                            if (input.dataset.nombre === item.id) { input.value = Math.round(parseFloat(num[1].replace(/\s+(con|coma|punto|y)\s+/g, '.').replace(',', '.')) * 100).toString(); input.dispatchEvent(new Event('input', { bubbles: true })); }
+                        });
                     }
-                    break;
                 }
-            }
-        }
-        if (actualizados.length > 0) mostrarMensajeMic(`✅ ¡Registrado!\n${actualizados.join(' | ')}`, "#d4edda", "#155724", "#c3e6cb");
-        else mostrarMensajeMic(`Escuché: "${frase}".\nNo detecté un artículo con su precio. Intenta de nuevo.`, "#fff3cd", "#856404", "#ffeeba");
+            });
+        };
+        recognition.onend = () => { reconociendo = false; document.getElementById('btn-microfono').innerHTML = "🎙️ Iniciar Dictado"; document.getElementById('btn-microfono').style.backgroundColor = "var(--voice)"; };
     }
+    function iniciarDictado() { if (!recognition) { alert("Navegador no soporta voz."); return; } reconociendo ? recognition.stop() : recognition.start(); }
 
-    // --- 📊 EXPORTADOR EXCEL MULTI-HOJA ELEGANTE ---
+    // --- 📊 EXPORTADOR EXCEL ---
     async function exportarExcel() {
-        if (typeof ExcelJS === 'undefined') { alert("Cargando librerías, intenta en un segundo..."); return; }
-        if (dbHistorial.length === 0) { alert("No hay datos para exportar"); return; }
-        
-        const wb = new ExcelJS.Workbook();
-        const headerBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003366' } };
-        const textWhite = { color: { argb: 'FFFFFFFF' }, bold: true };
-        const center = { horizontal: 'center', vertical: 'middle' };
-
-        // HOJA 1: RESUMEN GENERAL
-        const ws1 = wb.addWorksheet("Resumen General");
-        ws1.mergeCells('A1:F1');
-        let title1 = ws1.getCell('A1');
-        title1.value = "Control de Gastos de Inversión (Pastichos)";
-        title1.font = { bold: true, size: 14 }; title1.alignment = center;
-        
-        let row1 = ws1.addRow(['Fecha', 'Tasa USD (Bs)', 'Gastos Factura (Bs)', 'Gastos Adicionales (Bs)', 'Total Gastado (Bs)', 'Total Gastado ($)']);
-        row1.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
+        if (typeof ExcelJS === 'undefined') { alert("Cargando..."); return; }
+        const wb = new ExcelJS.Workbook(), headerBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003366' } }, textWhite = { color: { argb: 'FFFFFFFF' }, bold: true }, center = { horizontal: 'center', vertical: 'middle' };
+        const ws1 = wb.addWorksheet("Resumen General"); ws1.mergeCells('A1:F1'); ws1.getCell('A1').value = "Control de Gastos de Inversión"; ws1.getCell('A1').font = { bold: true, size: 14 }; ws1.getCell('A1').alignment = center;
+        ws1.addRow(['Fecha', 'Tasa USD', 'Gastos Factura (Bs)', 'Gastos Adic. (Bs)', 'Total (Bs)', 'Total ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
         ws1.columns = [{ width: 15 }, { width: 18 }, { width: 22 }, { width: 25 }, { width: 22 }, { width: 20 }];
+        dbHistorial.forEach(r => { let r1 = ws1.addRow([r.fecha, r.tasa, r.factura.reduce((s, i) => s + i.bs, 0), r.adicionales.reduce((s, i) => s + i.bs, 0), r.totalGastosBs, r.totalGastosUSD]); r1.getCell(2).numFmt = '#,##0.00 "Bs"'; r1.getCell(5).numFmt = '#,##0.00 "Bs"'; r1.getCell(6).numFmt = '"$"#,##0.00'; });
         
-        let totalBsGeneral = 0; let totalUSDGeneral = 0;
-        
+        const ws2 = wb.addWorksheet("Desglose"); ws2.columns = [{ width: 35 }, { width: 20 }, { width: 20 }];
         dbHistorial.forEach(reg => {
-            let gF = reg.factura.reduce((s, i) => s + i.bs, 0);
-            let gA = reg.adicionales.reduce((s, i) => s + i.bs, 0);
-            let r = ws1.addRow([reg.fecha, reg.tasa, gF, gA, reg.totalGastosBs, reg.totalGastosUSD]);
-            r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '#,##0.00 "Bs"'; 
-            r.getCell(4).numFmt = '#,##0.00 "Bs"'; r.getCell(5).numFmt = '#,##0.00 "Bs"'; 
-            r.getCell(6).numFmt = '"$"#,##0.00';
-            totalBsGeneral += reg.totalGastosBs; totalUSDGeneral += reg.totalGastosUSD;
-        });
-        let tRow1 = ws1.addRow(['', '', '', 'TOTAL GENERAL', totalBsGeneral, totalUSDGeneral]);
-        tRow1.font = { bold: true };
-        tRow1.getCell(5).numFmt = '#,##0.00 "Bs"'; tRow1.getCell(6).numFmt = '"$"#,##0.00';
-
-        // HOJA 2: DESGLOSE DETALLADO
-        const ws2 = wb.addWorksheet("Desglose Detallado");
-        ws2.mergeCells('A1:C1');
-        let title2 = ws2.getCell('A1');
-        title2.value = "Desglose Específico por Día de Compra";
-        title2.font = { bold: true, size: 14 }; title2.alignment = center;
-        ws2.columns = [{ width: 35 }, { width: 20 }, { width: 20 }];
-        
-        dbHistorial.forEach(reg => {
-            ws2.addRow([]); 
-            let hRow = ws2.addRow([`Compra del ${reg.fecha} (Tasa: ${reg.tasa} Bs/$)`, 'Monto (Bs)', 'Monto ($)']);
-            hRow.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.font.bold = true; });
-            
-            let fMainRow = ws2.addRow(['--- FACTURA PRINCIPAL ---', '', '']);
-            fMainRow.font = { bold: true, italic: true }; fMainRow.alignment = center;
-            ws2.mergeCells(`A${fMainRow.number}:C${fMainRow.number}`);
-            
-            reg.factura.forEach(item => {
-                let r = ws2.addRow([item.nombre, item.bs, item.bs / reg.tasa]);
-                r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00';
-            });
-            
-            let aMainRow = ws2.addRow(['--- GASTOS ADICIONALES ---', '', '']);
-            aMainRow.font = { bold: true, italic: true }; aMainRow.alignment = center;
-            ws2.mergeCells(`A${aMainRow.number}:C${aMainRow.number}`);
-            
-            reg.adicionales.forEach(item => {
-                let r = ws2.addRow([item.nombre, item.bs, item.bs / reg.tasa]);
-                r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00';
-            });
-            
-            let tDayRow = ws2.addRow(['TOTAL DEL DÍA', reg.totalGastosBs, reg.totalGastosUSD]);
-            tDayRow.font = { bold: true };
-            tDayRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEEEEE' } };
-            tDayRow.getCell(2).numFmt = '#,##0.00 "Bs"'; tDayRow.getCell(3).numFmt = '"$"#,##0.00';
+            ws2.addRow([`Compra ${reg.fecha}`, 'Monto (Bs)', 'Monto ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.font.bold = true; });
+            reg.factura.forEach(i => { let r = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]); r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00'; });
+            reg.adicionales.forEach(i => { let r = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]); r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00'; });
+            ws2.addRow([]);
         });
 
-        // HOJA 3: GANANCIAS Y RENTABILIDAD
-        const ws3 = wb.addWorksheet("Ganancias y Rentabilidad");
-        ws3.mergeCells('A1:J1');
-        let title3 = ws3.getCell('A1');
-        title3.value = "Control de Ganancias por Producción";
-        title3.font = { bold: true, size: 14 }; title3.alignment = center;
-        
-        let row3 = ws3.addRow(['Fecha', 'Tasa USD', 'Total Gastos (Bs)', 'Total Gastos ($)', 'Pastichos Producidos', 'Venta Pastichos ($)', 'Ingreso Delivery (Bs)', 'Delivery en USD ($)', 'Total Ingresos ($)', 'GANANCIA NETA ($)']);
-        row3.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
-        ws3.columns = [{ width: 12 }, { width: 12 }, { width: 18 }, { width: 15 }, { width: 20 }, { width: 20 }, { width: 22 }, { width: 20 }, { width: 18 }, { width: 20 }];
-        
-        let tGastosUSDRent = 0; let tIngresosUSDRent = 0; let tGananciaUSDRent = 0;
+        const ws3 = wb.addWorksheet("Rentabilidad"); ws3.columns = [{ width: 12 }, { width: 12 }, { width: 18 }, { width: 15 }, { width: 20 }, { width: 20 }, { width: 22 }, { width: 20 }, { width: 18 }, { width: 20 }];
+        ws3.addRow(['Fecha', 'Tasa USD', 'Gastos (Bs)', 'Gastos ($)', 'Prod.', 'Venta ($)', 'Delivery (Bs)', 'Delivery ($)', 'Ingresos ($)', 'GANANCIA ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
+        dbHistorial.forEach(r => { let r3 = ws3.addRow([r.fecha, r.tasa, r.totalGastosBs, r.totalGastosUSD, r.cantP, (r.cantP * r.precioP), r.deliveryBs, (r.deliveryBs / r.tasa), r.ingresosUSD, r.gananciaUSD]); r3.getCell(10).font = { bold: true, color: { argb: 'FF0000FF' } }; r3.getCell(10).numFmt = '"$"#,##0.00'; });
 
-        dbHistorial.forEach(reg => {
-            let r = ws3.addRow([
-                reg.fecha, reg.tasa, reg.totalGastosBs, reg.totalGastosUSD, 
-                reg.cantP, (reg.cantP * reg.precioP), reg.deliveryBs, (reg.deliveryBs / reg.tasa), 
-                reg.ingresosUSD, reg.gananciaUSD
-            ]);
-            r.getCell(2).numFmt = '#,##0.00'; r.getCell(3).numFmt = '#,##0.00 "Bs"';
-            r.getCell(4).numFmt = '"$"#,##0.00'; r.getCell(6).numFmt = '"$"#,##0.00';
-            r.getCell(7).numFmt = '#,##0.00 "Bs"'; r.getCell(8).numFmt = '"$"#,##0.00';
-            r.getCell(9).numFmt = '"$"#,##0.00'; r.getCell(10).numFmt = '"$"#,##0.00';
-            r.getCell(10).font = { bold: true, color: { argb: 'FF0000FF' } }; 
-            
-            tGastosUSDRent += reg.totalGastosUSD; tIngresosUSDRent += reg.ingresosUSD; tGananciaUSDRent += reg.gananciaUSD;
-        });
-        
-        let tRow3 = ws3.addRow(['', '', 'TOTALES ACUMULADOS', tGastosUSDRent, '', '', '', '', tIngresosUSDRent, tGananciaUSDRent]);
-        tRow3.font = { bold: true };
-        tRow3.getCell(4).numFmt = '"$"#,##0.00'; tRow3.getCell(9).numFmt = '"$"#,##0.00';
-        tRow3.getCell(10).numFmt = '"$"#,##0.00'; tRow3.getCell(10).font = { bold: true, color: { argb: 'FF0000FF' } };
-
-        // HOJA 4: MATRIZ DE INGREDIENTES
-        const ws4 = wb.addWorksheet("Matriz de Ingredientes");
-        let dates = dbHistorial.map(r => r.fecha);
-        ws4.mergeCells(1, 1, 1, dates.length > 0 ? dates.length + 1 : 2);
-        let title4 = ws4.getCell('A1');
-        title4.value = "Comparativa de Ingredientes Comprados por Día";
-        title4.font = { bold: true, size: 14 }; title4.alignment = center;
-        
-        let row4 = ws4.addRow(['Ingrediente', ...dates]);
-        row4.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
-        ws4.getColumn(1).width = 30;
-        for(let i = 2; i <= dates.length + 1; i++) ws4.getColumn(i).width = 15;
-        
-        let allIngredients = new Set();
-        dbHistorial.forEach(reg => {
-            reg.factura.forEach(i => allIngredients.add(i.nombre));
-            reg.adicionales.forEach(i => allIngredients.add(i.nombre));
-        });
-        
-        Array.from(allIngredients).forEach(ing => {
-            let rowData = [ing];
-            dbHistorial.forEach(reg => {
-                let found = [...reg.factura, ...reg.adicionales].find(i => i.nombre === ing);
-                rowData.push(found ? 'Sí' : 'No');
-            });
-            let r = ws4.addRow(rowData);
-            for(let i = 2; i <= rowData.length; i++) {
-                let cell = r.getCell(i);
-                cell.alignment = center;
-                if(cell.value === 'Sí') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6E0B4' } }; 
-                else if (cell.value === 'No') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8CBAD' } }; 
-            }
-        });
-
-        const buffer = await wb.xlsx.writeBuffer();
-        saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos_Nube.xlsx");
+        saveAs(new Blob([await wb.xlsx.writeBuffer()], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos_Nube.xlsx");
     }
 </script>
 </body>
