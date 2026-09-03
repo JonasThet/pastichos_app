@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pastichos">
     
-    <title>App Pastichos 14.3</title>
+    <title>App Pastichos 14.4</title>
     
     <!-- LIBRERÍAS DE FIREBASE (El Cerebro) -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -105,7 +105,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 14.3</h1>
+        <h1>🍕 App Pastichos 14.4</h1>
         <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
@@ -276,7 +276,6 @@
         input.value = integers + ',' + cents;
     }
 
-    // CORRECCIÓN MATEMÁTICA EN FACTURACIÓN
     function generarReciboWA() {
         let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente";
         let cant = parseInt(document.getElementById('fac-cant').value) || 1;
@@ -286,11 +285,8 @@
 
         if(tasa <= 0) { alert("Debes ingresar la tasa BCV para calcular en Bolívares."); return; }
 
-        // Calculamos el total crudo y lo forzamos a 2 decimales para evitar la paradoja del centavo
         let totalUSD_crudo = (cant * precioUSD) + (deliveryBs / tasa);
         let totalUSD_redondeado = Math.round(totalUSD_crudo * 100) / 100;
-        
-        // Ahora el total en Bs refleja exactamente la cifra en dólares multiplicada por la tasa
         let totalBs = totalUSD_redondeado * tasa;
 
         let mensaje = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n`;
@@ -300,7 +296,9 @@
         mensaje += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD_redondeado)}*\n`;
         mensaje += `🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n`;
         mensaje += `_(Calculado a Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n`;
-        mensaje += `¡Gracias por preferirnos! 🍕`;
+        mensaje += `¡Gracias por preferirnos! 🍕\n\n`;
+        mensaje += `💳 *PAGO MÓVIL BANESCO* 👇\n`;
+        mensaje += `0134 04248536405 31074703`;
 
         let url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
         window.open(url, '_blank');
