@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pastichos">
     
-    <title>App Pastichos 13.0</title>
+    <title>App Pastichos 13.1</title>
     
     <style>
         :root {
@@ -99,7 +99,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 13.0</h1>
+        <h1>🍕 App Pastichos 13.1</h1>
     </div>
     
     <div class="tabs">
@@ -175,7 +175,7 @@
             </div>
             <div class="fila">
                 <div class="campo"><label>Precio por Pasticho ($):</label><input type="text" id="fac-precio" value="10,00" oninput="formatearMoneda(event)"></div>
-                <div class="campo"><label>Costo de Delivery ($):</label><input type="text" id="fac-delivery" value="0,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Costo de Delivery (Bs):</label><input type="text" id="fac-delivery" value="0,00" oninput="formatearMoneda(event)"></div>
             </div>
             <div class="fila">
                 <div class="campo">
@@ -240,23 +240,23 @@
         input.value = integers + ',' + cents;
     }
 
-    // --- NUEVO MÓDULO: FACTURACIÓN ---
+    // --- NUEVO MÓDULO: FACTURACIÓN 13.1 ---
     function generarReciboWA() {
         let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente";
         let cant = parseInt(document.getElementById('fac-cant').value) || 1;
-        let precio = parsearMoneda(document.getElementById('fac-precio').value);
-        let delivery = parsearMoneda(document.getElementById('fac-delivery').value);
+        let precioUSD = parsearMoneda(document.getElementById('fac-precio').value);
+        let deliveryBs = parsearMoneda(document.getElementById('fac-delivery').value);
         let tasa = parsearMoneda(document.getElementById('fac-tasa').value);
 
         if(tasa <= 0) { alert("Debes ingresar la tasa BCV para calcular en Bolívares."); return; }
 
-        let totalUSD = (cant * precio) + delivery;
-        let totalBs = totalUSD * tasa;
+        let totalUSD = (cant * precioUSD) + (deliveryBs / tasa);
+        let totalBs = (cant * precioUSD * tasa) + deliveryBs;
 
         let mensaje = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n`;
         mensaje += `👤 *Cliente:* ${cliente}\n`;
-        mensaje += `📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precio)}\n`;
-        if(delivery > 0) mensaje += `🛵 *Delivery:* $${floatAFormatoMoneda(delivery)}\n`;
+        mensaje += `📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precioUSD)}\n`;
+        if(deliveryBs > 0) mensaje += `🛵 *Delivery:* ${floatAFormatoMoneda(deliveryBs)} Bs\n`;
         mensaje += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD)}*\n`;
         mensaje += `🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n`;
         mensaje += `_(Calculado a Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n`;
@@ -266,7 +266,7 @@
         window.open(url, '_blank');
     }
 
-    // --- RESPALDO Y MIGRACIÓN (Para pasar de PC a iPhone) ---
+    // --- RESPALDO Y MIGRACIÓN ---
     function exportarBaseDatos() {
         let data = { historial: dbHistorial, tasas: dbTasas };
         let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
@@ -389,7 +389,7 @@
         document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 10);
         document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
 
-        cargarListasLimpias(); // Reinicia la vista
+        cargarListasLimpias(); 
 
         let poblarLista = (listaGuardada, contenedorId) => {
             listaGuardada.forEach(item => {
@@ -407,7 +407,6 @@
         poblarLista(reg.factura, 'lista-factura');
         poblarLista(reg.adicionales, 'lista-adicionales');
 
-        // Borra el viejo para que el usuario guarde el nuevo limpio
         borrarRegistroSilencioso(id);
         cambiarPestana('registro');
         window.scrollTo(0,0);
