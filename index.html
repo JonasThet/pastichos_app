@@ -8,8 +8,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pastichos">
     
-    <title>App Pastichos 13.1</title>
+    <title>App Pastichos 14.0</title>
     
+    <!-- LIBRERÍAS DE FIREBASE (El Cerebro) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary: #2c3e50; --secondary: #2980b9;
@@ -19,9 +23,11 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; }
         .container { max-width: 950px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); overflow: hidden; }
         
-        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 20px; }
-        .header h1 { margin: 0; font-size: 28px; }
-        
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 20px; position: relative; }
+        .header h1 { margin: 0; font-size: 28px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .nube-status { font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; }
+        .dot { height: 10px; width: 10px; background-color: #2ecc71; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #2ecc71; }
+
         .tabs { display: flex; background: #34495e; overflow-x: auto; white-space: nowrap; }
         .tab-btn { flex: 1; padding: 15px; text-align: center; color: white; background: none; border: none; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .tab-btn:hover { background: rgba(255,255,255,0.1); }
@@ -99,7 +105,8 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 13.1</h1>
+        <h1>🍕 App Pastichos 14.0</h1>
+        <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
     <div class="tabs">
@@ -151,21 +158,21 @@
             </div>
         </div>
 
-        <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 CALCULAR Y GUARDAR DÍA</button>
+        <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 GUARDAR EN LA NUBE</button>
     </div>
 
-    <!-- PESTAÑA 2: HISTORIAL Y MIGRACIÓN -->
+    <!-- PESTAÑA 2: HISTORIAL (AHORA 100% EN LA NUBE) -->
     <div id="historial" class="tab-content">
         <div class="respaldo-bar">
-            <button class="btn btn-respaldo" onclick="exportarBaseDatos()">💾 Exportar Datos (Para PC)</button>
-            <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Importar Datos (En iPhone)</button>
+            <button class="btn btn-respaldo" onclick="exportarBaseDatos()">💾 Bajar Datos a PC (Backup)</button>
+            <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Subir Datos (Migrar a Nube)</button>
             <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarBaseDatos(event)">
         </div>
         <button class="btn btn-excel" onclick="exportarExcel()">📥 DESCARGAR EXCEL ELEGANTE (.xlsx)</button>
         <div id="contenedor-historial"></div>
     </div>
 
-    <!-- PESTAÑA 3: FACTURACIÓN A CLIENTES -->
+    <!-- PESTAÑA 3: FACTURACIÓN -->
     <div id="facturacion" class="tab-content">
         <div class="seccion">
             <h3>🧾 Generar Recibo de Compra</h3>
@@ -192,12 +199,44 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
 
 <script>
-    // --- 🗄️ BASE DE DATOS Y LÓGICA CORE ---
+    // --- ☁️ CONEXIÓN AL CEREBRO DE FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjpLoYht4eQUNAl3xugp0URv7cmiXFS7Q",
+        authDomain: "app-pastichos.firebaseapp.com",
+        databaseURL: "https://app-pastichos-default-rtdb.firebaseio.com", 
+        projectId: "app-pastichos",
+        storageBucket: "app-pastichos.firebasestorage.app",
+        messagingSenderId: "983517004864",
+        appId: "1:983517004864:web:45ff5462b1853f64d10ba5"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     const fFacturaBase = ["Jamón", "Queso Mozarrella", "Queso Parmesano", "Envases de Aluminio", "Pasta de tomate", "Pasta para pasticho", "Mantequilla Mavesa", "Cubitos Maggi", "Leche", "Cucharillas", "I.V.A. (16%)"];
     const fAdicionalesBase = ["Carne molida", "Pan Campesino", "Nuez Moscada", "Aliños (Tomate/Cebolla/etc)"];
     
-    let dbHistorial = JSON.parse(localStorage.getItem('pastichosDB')) || [];
+    let dbHistorial = [];
     let dbTasas = JSON.parse(localStorage.getItem('tasasBCV_Memoria')) || {};
+
+    // 🔴 MAGIA EN TIEMPO REAL: Este código escucha la nube 24/7
+    database.ref('historial').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Convertimos la caja fuerte de Google a una lista
+            dbHistorial = Object.values(data).sort((a, b) => a.id - b.id);
+        } else {
+            dbHistorial = [];
+            // AUTOMIGRACIÓN: Si la nube está vacía pero hay datos en este teléfono, súbelos automático
+            let localBackup = JSON.parse(localStorage.getItem('pastichosDB'));
+            if (localBackup && localBackup.length > 0) {
+                localBackup.forEach(reg => database.ref('historial/' + reg.id).set(reg));
+                localStorage.removeItem('pastichosDB'); // Limpiamos para evitar duplicados
+                alert("☁️ ¡Migración Exitosa! Se detectaron registros viejos y fueron subidos a la Nube.");
+            }
+        }
+        renderizarHistorial(); // Actualiza la pantalla sola al recibir un cambio
+    });
 
     function cambiarPestana(id) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -240,7 +279,7 @@
         input.value = integers + ',' + cents;
     }
 
-    // --- NUEVO MÓDULO: FACTURACIÓN 13.1 ---
+    // --- MÓDULO: FACTURACIÓN 13.1 (Corregido a Bs) ---
     function generarReciboWA() {
         let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente";
         let cant = parseInt(document.getElementById('fac-cant').value) || 1;
@@ -266,11 +305,11 @@
         window.open(url, '_blank');
     }
 
-    // --- RESPALDO Y MIGRACIÓN ---
+    // --- RESPALDO MANUAL (A Nube y PC) ---
     function exportarBaseDatos() {
         let data = { historial: dbHistorial, tasas: dbTasas };
         let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-        saveAs(blob, "Respaldo_Pastichos.json");
+        saveAs(blob, "Respaldo_Pastichos_Nube.json");
     }
 
     function importarBaseDatos(event) {
@@ -280,20 +319,21 @@
         reader.onload = function(e) {
             try {
                 let data = JSON.parse(e.target.result);
-                if (data.historial && data.tasas) {
-                    localStorage.setItem('pastichosDB', JSON.stringify(data.historial));
+                if (data.historial) {
+                    // Sube cada registro importado a la Nube de Google
+                    data.historial.forEach(reg => database.ref('historial/' + reg.id).set(reg));
+                    alert("¡Los registros del archivo fueron subidos a la Nube con éxito!");
+                }
+                if (data.tasas) {
                     localStorage.setItem('tasasBCV_Memoria', JSON.stringify(data.tasas));
-                    dbHistorial = data.historial;
                     dbTasas = data.tasas;
-                    renderizarHistorial();
-                    alert("¡Historial importado con éxito!");
-                } else { alert("El archivo no tiene el formato correcto."); }
+                }
             } catch (err) { alert("Error al leer el archivo."); }
         };
         reader.readAsText(file);
     }
 
-    // --- LÓGICA DEL FORMULARIO Y EDICIÓN ---
+    // --- LÓGICA DEL FORMULARIO ---
     function crearFilaHTML(nombre, esFijo, idUnico) {
         let esIva = (nombre === "I.V.A. (16%)");
         let extraStyle = esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : "";
@@ -322,7 +362,6 @@
         fechaInput.value = obtenerFechaLocal();
         fechaInput.addEventListener('change', buscarTasa);
         buscarTasa(); 
-        renderizarHistorial();
     };
 
     async function buscarTasa() {
@@ -377,11 +416,10 @@
         }
     }
 
-    // --- NUEVO: EDICIÓN DE HISTORIAL ---
     function editarRegistroHistorial(id) {
         let reg = dbHistorial.find(r => r.id === id);
         if(!reg) return;
-        if(!confirm("Vamos a enviar este día al formulario para que puedas corregir los precios. Al guardar, reemplazará al actual. ¿Continuar?")) return;
+        if(!confirm("Se devolverán los datos para corregirlos. Al guardar, se actualizará en la Nube. ¿Continuar?")) return;
 
         document.getElementById('fecha').value = reg.fecha;
         document.getElementById('tasa').value = floatAFormatoMoneda(reg.tasa);
@@ -407,20 +445,16 @@
         poblarLista(reg.factura, 'lista-factura');
         poblarLista(reg.adicionales, 'lista-adicionales');
 
-        borrarRegistroSilencioso(id);
+        // Borra de la nube silenciosamente para preparar el guardado del nuevo
+        database.ref('historial/' + id).remove();
+        
         cambiarPestana('registro');
         window.scrollTo(0,0);
     }
 
-    function borrarRegistroSilencioso(id) {
-        dbHistorial = dbHistorial.filter(reg => reg.id !== id);
-        localStorage.setItem('pastichosDB', JSON.stringify(dbHistorial));
-        renderizarHistorial();
-    }
-
     function borrarRegistroHistorial(id) {
-        if(confirm("¿Estás seguro de eliminar este registro permanentemente?")) {
-            borrarRegistroSilencioso(id);
+        if(confirm("¿Estás seguro de eliminar este registro permanentemente de la Nube? Todos los dispositivos lo perderán.")) {
+            database.ref('historial/' + id).remove();
         }
     }
 
@@ -462,16 +496,17 @@
             ingresosUSD: ingresosUSD, gananciaUSD: gananciaUSD
         };
 
-        dbHistorial.push(registro);
-        localStorage.setItem('pastichosDB', JSON.stringify(dbHistorial)); 
-        alert(`¡Día guardado con éxito!\nGanancia neta: $${gananciaUSD.toFixed(2)}`);
-        limpiarTodo(); cargarListasLimpias(); renderizarHistorial(); cambiarPestana('historial');
+        // ENVIAR A LA NUBE DE GOOGLE DIRECTAMENTE (No necesita renderizar porque el listener 'on value' lo hace solo)
+        database.ref('historial/' + registro.id).set(registro);
+        
+        alert(`☁️ ¡Enviado a la Nube con éxito!\nGanancia neta: $${gananciaUSD.toFixed(2)}`);
+        limpiarTodo(); cargarListasLimpias(); cambiarPestana('historial');
     }
 
     function renderizarHistorial() {
         const divH = document.getElementById('contenedor-historial');
         divH.innerHTML = "";
-        if (dbHistorial.length === 0) { divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>Aún no hay días guardados.</h3>"; return; }
+        if (dbHistorial.length === 0) { divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>La Nube está vacía.</h3>"; return; }
 
         let dbReverse = [...dbHistorial].reverse();
         dbReverse.forEach(reg => {
@@ -604,7 +639,7 @@
         });
 
         const buffer = await wb.xlsx.writeBuffer();
-        saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos.xlsx");
+        saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos_Nube.xlsx");
     }
 </script>
 </body>
