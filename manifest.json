@@ -1,0 +1,16 @@
+{
+  "name": "App Pastichos",
+  "short_name": "Pastichos",
+  "start_url": "./?v=17",
+  "display": "standalone",
+  "background_color": "#ecf0f1",
+  "theme_color": "#2c3e50",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3595/3595458.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
