@@ -1,7 +1,7 @@
 {
   "name": "App Pastichos",
   "short_name": "Pastichos",
-  "start_url": "./?v=17",
+  "start_url": "./?v=18",
   "display": "standalone",
   "background_color": "#ecf0f1",
   "theme_color": "#2c3e50",
