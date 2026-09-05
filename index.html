@@ -284,7 +284,7 @@
         } else {
             let cola = JSON.parse(localStorage.getItem('bunker_pedidos')) || [];
             cola.push(nuevo); localStorage.setItem('bunker_pedidos', JSON.stringify(cola));
-            dbPedidos.push(nuevo); renderizarPedidos(); // Mostramos visualmente aunque no haya internet
+            dbPedidos.push(nuevo); renderizarPedidos(); 
             alert("📵 Guardado en el teléfono. Se subirá a Patricia al recuperar señal.");
         }
         
@@ -321,7 +321,6 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // ... FUNCIONES SECUNDARIAS (limpiar, crear filas, buscar tasa) ...
     function crearFilaHTML(nombre, esFijo, idUnico) { let esIva = (nombre === "I.V.A. (16%)"); return `<div class="ingrediente-row" id="row-${idUnico}" style="${esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : ""}"><label style="${esIva ? "color: #856404; font-weight: bold;" : ""}">${esIva ? '🧾 ' : ''}${nombre}</label><div class="ingreso-wrapper"><input type="text" class="monto-input" data-nombre="${nombre}" data-tipo="${esFijo ? 'fijo' : 'nuevo'}" oninput="formatearMoneda(event)" placeholder="0,00"><button class="btn btn-delete" onclick="borrarFila('row-${idUnico}', ${esFijo})" title="Borrar">❌</button></div></div>`; }
     function cargarListasLimpias() { document.getElementById('lista-factura').innerHTML = ""; document.getElementById('lista-adicionales').innerHTML = ""; fFacturaBase.forEach((ing, i) => document.getElementById('lista-factura').innerHTML += crearFilaHTML(ing, true, 'F'+i)); fAdicionalesBase.forEach((ing, i) => document.getElementById('lista-adicionales').innerHTML += crearFilaHTML(ing, true, 'A'+i)); }
 
@@ -363,25 +362,43 @@
         } else {
             let cola = JSON.parse(localStorage.getItem('bunker_historial')) || [];
             cola.push(registro); localStorage.setItem('bunker_historial', JSON.stringify(cola));
-            dbHistorial.push(registro); renderizarHistorial(); // Mostramos en la pantalla aunque esté offline
+            dbHistorial.push(registro); renderizarHistorial(); 
             alert(`📵 ¡Guardado en Modo Búnker!\nGanancia: $${gUSD.toFixed(2)}\nSe enviará a la Nube en cuanto recuperes el internet.`);
         }
         limpiarTodo(); cargarListasLimpias(); cambiarPestana('historial');
     }
 
+    // --- RENDERIZADO DEL HISTORIAL CON BOTONES RESTAURADOS ---
     function renderizarHistorial() {
         const divH = document.getElementById('contenedor-historial'); divH.innerHTML = "";
-        if (dbHistorial.length === 0) divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>La Nube está vacía.</h3>";
+        if (dbHistorial.length === 0) { divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>La Nube está vacía.</h3>"; return; }
         [...dbHistorial].reverse().forEach(r => {
             let hF = `<div class="detalles-box"><strong>🧾 Factura Principal</strong><br>`, hA = `<div class="detalles-box"><strong>➕ Gastos Adicionales</strong><br>`;
             r.factura.forEach(f => hF += `<div class="item-line" ${f.nombre==="I.V.A. (16%)"?'style="font-weight:bold;color:#856404;background:#fff3cd;"':''}><span>${f.nombre}</span> <span>${f.bs.toLocaleString('es-VE')} Bs</span></div>`); hF += `</div>`;
             r.adicionales.forEach(a => hA += `<div class="item-line"><span>${a.nombre}</span> <span>${a.bs.toLocaleString('es-VE')} Bs</span></div>`); hA += `</div>`;
-            divH.innerHTML += `<div class="factura-card"><div class="factura-header"><span class="factura-title">📅 ${r.fecha}</span><div class="header-right"><span style="font-weight:bold;">Tasa: ${r.tasa.toLocaleString('es-VE')} Bs</span></div></div><div class="factura-details">${hF}${hA}<div class="totales-box"><strong>📊 Resumen</strong><div style="margin-top:10px;">Inversión: $${r.totalGastosUSD.toFixed(2)}</div><div>Ingresos: $${r.ingresosUSD.toFixed(2)}</div><div class="ganancia-text">Ganancia: $${r.gananciaUSD.toFixed(2)}</div></div></div></div>`;
+            divH.innerHTML += `<div class="factura-card"><div class="factura-header"><span class="factura-title">📅 ${r.fecha}</span><div class="header-right"><span style="font-weight:bold;">Tasa: ${r.tasa.toLocaleString('es-VE')} Bs</span><button class="btn btn-editar-historial" onclick="editarRegistroHistorial(${r.id})">✏️ Editar</button><button class="btn btn-eliminar-historial" onclick="borrarRegistroHistorial(${r.id})">❌ Borrar</button></div></div><div class="factura-details">${hF}${hA}<div class="totales-box"><strong>📊 Resumen</strong><div style="margin-top:10px;">Inversión: $${r.totalGastosUSD.toFixed(2)}</div><div>Ingresos: $${r.ingresosUSD.toFixed(2)}</div><div class="ganancia-text">Ganancia: $${r.gananciaUSD.toFixed(2)}</div></div></div></div>`;
         });
     }
 
-    function editarRegistroHistorial(id) { alert("La edición está deshabilitada temporalmente en Modo Búnker para proteger los datos."); }
-    function borrarRegistroHistorial(id) { if(navigator.onLine) { if(confirm("¿Eliminar registro?")) database.ref('historial/' + id).remove(); } else alert("Conéctate a internet para borrar facturas."); }
+    // --- FUNCIONES DE EDICIÓN Y BORRADO RESTAURADAS CON SEGURO OFFLINE ---
+    function editarRegistroHistorial(id) {
+        if(!navigator.onLine) { alert("Conéctate a internet para poder editar facturas."); return; }
+        let reg = dbHistorial.find(r => r.id === id); if(!reg || !confirm("Devolver datos para corregir. ¿Continuar?")) return;
+        document.getElementById('fecha').value = reg.fecha; document.getElementById('tasa').value = floatAFormatoMoneda(reg.tasa);
+        document.getElementById('cantPastichos').value = reg.cantP || 10; document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 10); document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
+        cargarListasLimpias(); 
+        let poblar = (lista, cont) => { lista.forEach(i => {
+            let input = document.querySelector(`#${cont} input[data-nombre="${i.nombre}"]`);
+            if(!input) { document.getElementById(cont).insertAdjacentHTML('beforeend', crearFilaHTML(i.nombre, false, 'N'+Math.random())); input = document.querySelector(`#${cont} input[data-nombre="${i.nombre}"]`); }
+            input.value = Math.round(i.bs * 100).toString(); input.dispatchEvent(new Event('input', { bubbles: true }));
+        });};
+        poblar(reg.factura, 'lista-factura'); poblar(reg.adicionales, 'lista-adicionales');
+        database.ref('historial/' + id).remove(); cambiarPestana('registro'); window.scrollTo(0,0);
+    }
+
+    function borrarRegistroHistorial(id) {
+        if(navigator.onLine) { if(confirm("¿Eliminar registro de la Nube?")) database.ref('historial/' + id).remove(); } else { alert("Conéctate a internet para borrar facturas."); }
+    }
 
     // --- MOTOR DE VOZ ---
     let reconociendo = false, recognition;
@@ -397,6 +414,21 @@
         recognition.onend = () => { reconociendo = false; document.getElementById('btn-microfono').innerHTML = "🎙️ Iniciar Dictado"; document.getElementById('btn-microfono').style.backgroundColor = "var(--voice)"; };
     }
     function iniciarDictado() { if (!recognition) { alert("Navegador no soporta voz."); return; } reconociendo ? recognition.stop() : recognition.start(); }
+
+    // --- RESPALDO ---
+    function exportarBaseDatos() { saveAs(new Blob([JSON.stringify({ historial: dbHistorial, tasas: dbTasas })], { type: "application/json" }), "Respaldo_Pastichos.json"); }
+    function importarBaseDatos(event) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                let data = JSON.parse(e.target.result);
+                if (data.historial) data.historial.forEach(reg => database.ref('historial/' + reg.id).set(reg));
+                if (data.tasas) { localStorage.setItem('tasasBCV_Memoria', JSON.stringify(data.tasas)); dbTasas = data.tasas; }
+                alert("¡Datos subidos a la Nube con éxito!");
+            } catch (err) { alert("Error al leer el archivo."); }
+        };
+        if(event.target.files[0]) reader.readAsText(event.target.files[0]);
+    }
 
     // --- EXPORTADOR EXCEL ---
     async function exportarExcel() {
