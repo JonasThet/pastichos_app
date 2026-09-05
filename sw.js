@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pastichos-bunker-v17';
+const CACHE_NAME = 'pastichos-bunker-v18';
 const urlsToCache = [
   './',
   './index.html',
@@ -18,8 +18,8 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        if (response) return response; // Si no hay internet, saca de la memoria
-        return fetch(event.request); // Si hay internet, busca en la red
+        if (response) return response; 
+        return fetch(event.request); 
       })
   );
 });
@@ -31,7 +31,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName); // Borra memorias viejas
+            return caches.delete(cacheName); 
           }
         })
       );
