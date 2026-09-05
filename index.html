@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pastichos">
+    
+    <!-- CONEXIÓN AL MANIFEST PARA MODO OFFLINE -->
+    <link rel="manifest" href="manifest.json">
+    
+    <title>App Pastichos 18.0</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --primary: #2c3e50; --secondary: #2980b9; --accent: #27ae60; --danger: #c0392b; --bg: #ecf0f1; --voice: #8e44ad; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 950px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); overflow: hidden; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 20px; position: relative; }
+        .header h1 { margin: 0; font-size: 28px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .nube-status { font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; transition: 0.3s; }
+        .dot { height: 10px; width: 10px; background-color: #2ecc71; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #2ecc71; transition: 0.3s; }
+        .tabs { display: flex; background: #34495e; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { flex: 1; min-width: 120px; padding: 15px 5px; text-align: center; color: white; background: none; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .tab-btn:hover { background: rgba(255,255,255,0.1); }
+        .tab-btn.active { background: var(--accent); }
+        .tab-content { display: none; padding: 30px; }
+        .tab-content.active { display: block; }
+        .seccion { background: #fdfdfd; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .seccion h3 { color: var(--secondary); border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-top: 0; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .fila { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+        .campo { display: flex; flex-direction: column; flex: 1; min-width: 130px; position: relative; }
+        label { font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; }
+        input { padding: 10px; border: 1px solid #ccd1d9; border-radius: 6px; font-size: 16px; transition: border 0.3s; }
+        input:focus { border-color: var(--secondary); outline: none; }
+        .indicador-api { position: absolute; top: 0; right: 0; font-size: 11px; color: #27ae60; font-weight: bold; display: none; }
+        .btn-mic { background: var(--voice); color: white; width: 100%; font-size: 18px; padding: 15px; margin-bottom: 20px; text-transform: uppercase; border-radius: 8px; box-shadow: 0 4px 10px rgba(142,68,173,0.3); border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-mic:hover { background: #732d91; transform: translateY(-2px); }
+        .mic-status { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; border: 1px solid #c3e6cb; margin-bottom: 20px; display: none; font-weight: bold; text-align: center; font-size: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); white-space: pre-line; }
+        .ingrediente-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; transition: 0.2s; }
+        .ingrediente-row:hover { background: #f9f9f9; border-color: #ccc; }
+        .ingreso-wrapper { display: flex; align-items: center; gap: 10px; }
+        .monto-input { width: 130px; text-align: right; font-weight: bold; color: #2c3e50; }
+        .btn { border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
+        .btn-add { background: #3498db; font-size: 14px; margin-top: 10px; }
+        .btn-clear-all { background: var(--danger); width: 100%; padding: 12px; }
+        .btn-delete { background: #e74c3c; padding: 8px; border-radius: 50%; font-size: 12px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+        .btn-calcular { background: #e67e22; width: 100%; font-size: 20px; padding: 18px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(230,126,34,0.3); }
+        .btn-excel { background: var(--accent); padding: 15px 25px; font-size: 16px; display: block; margin: 0 auto 10px auto; width: 100%; text-align: center; }
+        .btn-whatsapp { background: #25D366; width: 100%; font-size: 18px; padding: 15px; margin-top: 15px; text-transform: uppercase; }
+        .factura-card { background: white; border: 2px dashed #bdc3c7; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .factura-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .factura-title { font-size: 18px; font-weight: bold; color: var(--primary); }
+        .btn-eliminar-historial { background: var(--danger); font-size: 12px; padding: 6px 10px; }
+        .btn-editar-historial { background: var(--secondary); font-size: 12px; padding: 6px 10px; }
+        .factura-details { display: flex; flex-wrap: wrap; gap: 20px; }
+        .detalles-box { flex: 1; min-width: 250px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
+        .totales-box { flex: 1; min-width: 200px; background: #ebf5fb; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d6eaf8; }
+        .ganancia-text { font-size: 24px; color: var(--accent); font-weight: bold; margin-top: 10px; }
+        .item-line { display: flex; justify-content: space-between; font-size: 14px; border-bottom: 1px solid #eee; padding: 6px 0; }
+        .respaldo-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-respaldo { background: #7f8c8d; flex: 1; }
+        .pedido-tachable { flex: 1; cursor: pointer; transition: 0.2s; font-size: 16px; user-select: none; }
+        .pedido-tachable:active { opacity: 0.5; }
+        @media (max-width: 768px) {
+            body { padding: 0; background-color: white; } 
+            .container { border-radius: 0; box-shadow: none; max-width: 100%; }
+            .header { padding: 15px 10px; }
+            .header h1 { font-size: 22px; }
+            .tab-btn { font-size: 13px; padding: 12px 5px; }
+            .tab-content { padding: 15px; }
+            .top-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+            .fila { flex-direction: column; gap: 12px; }
+            .campo { width: 100%; }
+            .ingrediente-row { flex-direction: column; align-items: stretch; gap: 8px; padding: 15px; }
+            .ingrediente-row label { text-align: center; font-size: 16px; margin-bottom: 5px; }
+            .ingreso-wrapper { justify-content: center; width: 100%; }
+            .monto-input { width: 65%; font-size: 16px; padding: 12px; text-align: center; }
+            .factura-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .header-right { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+            .btn-mic, .btn-calcular, .btn-whatsapp { font-size: 16px; padding: 15px; }
+            .respaldo-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🍕 App Pastichos 18.0</h1>
+        <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="cambiarPestana('registro')">📝 Registro</button>
+        <button class="tab-btn" onclick="cambiarPestana('monitor')">📋 Monitor</button>
+        <button class="tab-btn" onclick="cambiarPestana('historial')">🗄️ Historial</button>
+        <button class="tab-btn" onclick="cambiarPestana('facturacion')">🧾 Facturar</button>
+    </div>
+
+    <!-- PESTAÑA 1: REGISTRO -->
+    <div id="registro" class="tab-content active">
+        <button id="btn-microfono" class="btn-mic" onclick="iniciarDictado()">🎙️ Iniciar Dictado Continuo</button>
+        <div id="mic-status" class="mic-status"></div>
+        <div class="top-bar">
+            <h2 style="color: #2c3e50; margin:0;">Registro de Inversión</h2>
+            <button class="btn" style="background:var(--danger); padding:10px;" onclick="limpiarTodo()">🧹 Limpiar Precios</button>
+        </div>
+        <div class="seccion">
+            <h3>1. Datos del Día</h3>
+            <div class="fila">
+                <div class="campo"><label>Fecha de Compra:</label><input type="date" id="fecha"></div>
+                <div class="campo">
+                    <label>Tasa del Dólar (Bs/$):</label>
+                    <span id="indicador-tasa" class="indicador-api"></span>
+                    <input type="text" id="tasa" placeholder="0,00" oninput="formatearMoneda(event)">
+                </div>
+            </div>
+        </div>
+        <div class="seccion">
+            <h3>2. Factura Principal (Bs)</h3>
+            <div id="lista-factura"></div>
+            <button class="btn btn-add" onclick="agregarItem('lista-factura', false)">+ Añadir artículo extra</button>
+        </div>
+        <div class="seccion">
+            <h3>3. Gastos Adicionales (Bs)</h3>
+            <div id="lista-adicionales"></div>
+            <button class="btn btn-add" onclick="agregarItem('lista-adicionales', false)">+ Añadir gasto extra</button>
+        </div>
+        <div class="seccion">
+            <h3>4. Proyección de Ventas</h3>
+            <div class="fila">
+                <div class="campo"><label>Cant. Pastichos a Vender:</label><input type="number" id="cantPastichos" value="10"></div>
+                <div class="campo"><label>Precio Venta c/u ($):</label><input type="text" id="precioPasticho" value="10,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Ingreso Delivery Total (Bs):</label><input type="text" id="deliveryBs" value="0,00" oninput="formatearMoneda(event)"></div>
+            </div>
+        </div>
+        <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 GUARDAR EN LA NUBE</button>
+    </div>
+
+    <!-- PESTAÑA 2: MONITOR DE PEDIDOS -->
+    <div id="monitor" class="tab-content">
+        <div class="seccion">
+            <h3>📋 Preventa y Reservas (Próximo Lote)</h3>
+            <div style="background: #ebf5fb; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d6eaf8; margin-bottom: 20px;">
+                <span style="font-size: 18px; color: #2c3e50;">Total Pastichos Reservados:</span><br>
+                <span id="total-reservados" style="font-size: 32px; font-weight: bold; color: var(--secondary);">0</span>
+            </div>
+            <div class="fila" style="align-items: flex-end;">
+                <div class="campo" style="flex: 2;"><label>Nombre del Cliente:</label><input type="text" id="mon-cliente" placeholder="Ej: Scarlit Sánchez"></div>
+                <div class="campo" style="flex: 1;"><label>Cantidad:</label><input type="number" id="mon-cant" value="1" min="1"></div>
+                <div class="campo" style="flex: 1;"><button class="btn btn-add" style="margin:0; padding:12px; height: 44px;" onclick="agregarPedido()">➕ Anotar</button></div>
+            </div>
+            <div style="margin-top: 20px;">
+                <h4 style="color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Lista de Clientes</h4>
+                <div id="lista-pedidos"></div>
+            </div>
+            <button class="btn btn-clear-all" onclick="limpiarPedidos()" style="margin-top: 30px;">🗑️ BORRAR LISTA PARA NUEVO LOTE</button>
+        </div>
+    </div>
+
+    <!-- PESTAÑA 3: HISTORIAL -->
+    <div id="historial" class="tab-content">
+        <div class="respaldo-bar">
+            <button class="btn btn-respaldo" onclick="exportarBaseDatos()">💾 Bajar Datos</button>
+            <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Subir Datos</button>
+            <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarBaseDatos(event)">
+        </div>
+        <button class="btn btn-excel" onclick="exportarExcel()">📥 DESCARGAR EXCEL ELEGANTE</button>
+        <div id="contenedor-historial"></div>
+    </div>
+
+    <!-- PESTAÑA 4: FACTURACIÓN -->
+    <div id="facturacion" class="tab-content">
+        <div class="seccion">
+            <h3>🧾 Generar Recibo de Compra</h3>
+            <div class="fila">
+                <div class="campo"><label>Nombre del Cliente:</label><input type="text" id="fac-cliente" placeholder="Ej: Juan Pérez"></div>
+                <div class="campo"><label>Cantidad de Pastichos:</label><input type="number" id="fac-cant" value="1"></div>
+            </div>
+            <div class="fila">
+                <div class="campo"><label>Precio por Pasticho ($):</label><input type="text" id="fac-precio" value="10,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Costo de Delivery (Bs):</label><input type="text" id="fac-delivery" value="0,00" oninput="formatearMoneda(event)"></div>
+            </div>
+            <div class="fila">
+                <div class="campo">
+                    <label>Tasa BCV del Día (Bs/$):</label>
+                    <input type="text" id="fac-tasa" placeholder="0,00" oninput="formatearMoneda(event)">
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-whatsapp" onclick="generarReciboWA()">📲 Generar y Enviar por WhatsApp</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
+
+<script>
+    // --- DETECCIÓN DE INTERNET ---
+    const uiNube = document.getElementById('nube-status');
+    const dot = uiNube.querySelector('.dot');
+    
+    function chequearInternet() {
+        if(navigator.onLine) {
+            uiNube.innerHTML = '<span class="dot" style="background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71;"></span> Conectado a la Nube';
+            sincronizarColaOffline();
+        } else {
+            uiNube.innerHTML = '<span class="dot" style="background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c;"></span> Sin Internet (Modo Búnker)';
+        }
+    }
+    window.addEventListener('online', chequearInternet);
+    window.addEventListener('offline', chequearInternet);
+
+    // --- ☁️ CONEXIÓN A FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjpLoYht4eQUNAl3xugp0URv7cmiXFS7Q", authDomain: "app-pastichos.firebaseapp.com",
+        databaseURL: "https://app-pastichos-default-rtdb.firebaseio.com", projectId: "app-pastichos",
+        storageBucket: "app-pastichos.firebasestorage.app", messagingSenderId: "983517004864", appId: "1:983517004864:web:45ff5462b1853f64d10ba5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const fFacturaBase = ["Jamón", "Queso Mozarrella", "Queso Parmesano", "Envases de Aluminio", "Pasta de tomate", "Pasta para pasticho", "Mantequilla Mavesa", "Cubitos Maggi", "Leche", "Cucharillas", "I.V.A. (16%)"];
+    const fAdicionalesBase = ["Carne molida", "Pan Campesino", "Nuez Moscada", "Aliños (Tomate/Cebolla/etc)"];
+    
+    let dbHistorial = []; let dbPedidos = []; let dbTasas = JSON.parse(localStorage.getItem('tasasBCV_Memoria')) || {};
+
+    database.ref('historial').on('value', (snapshot) => { const data = snapshot.val(); dbHistorial = data ? Object.values(data).sort((a, b) => a.id - b.id) : []; renderizarHistorial(); });
+    database.ref('pedidos').on('value', (snapshot) => { const data = snapshot.val(); dbPedidos = data ? Object.values(data).sort((a, b) => a.id - b.id) : []; renderizarPedidos(); });
+
+    // --- SISTEMA DE COLA OFFLINE ---
+    function sincronizarColaOffline() {
+        let colaHistorial = JSON.parse(localStorage.getItem('bunker_historial')) || [];
+        let colaPedidos = JSON.parse(localStorage.getItem('bunker_pedidos')) || [];
+        
+        if(colaHistorial.length > 0) {
+            colaHistorial.forEach(reg => database.ref('historial/' + reg.id).set(reg));
+            localStorage.removeItem('bunker_historial');
+            alert("✅ Se recuperó la señal. Se subieron los gastos guardados mientras no había internet.");
+        }
+        if(colaPedidos.length > 0) {
+            colaPedidos.forEach(ped => database.ref('pedidos/' + ped.id).set(ped));
+            localStorage.removeItem('bunker_pedidos');
+            alert("✅ Se recuperó la señal. Se subieron los clientes guardados mientras no había internet.");
+        }
+    }
+
+    function cambiarPestana(id) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); event.currentTarget.classList.add('active');
+        if(id === 'facturacion') document.getElementById('fac-tasa').value = document.getElementById('tasa').value;
+    }
+
+    function obtenerFechaLocal() { return (new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000))).toISOString().split('T')[0]; }
+    function floatAFormatoMoneda(num) { let parts = (Math.round(num * 100) / 100).toFixed(2).split('.'); if (!parts[1]) parts[1] = "00"; else if (parts[1].length === 1) parts[1] += "0"; return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + parts[1]; }
+    function parsearMoneda(v) { return parseFloat((v || "").replace(/\./g, '').replace(',', '.')) || 0; }
+    function formatearMoneda(e) { let val = e.target.value.replace(/\D/g, ''); if (val === '') { e.target.value = ''; return; } e.target.value = Math.floor(parseInt(val, 10) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + (parseInt(val, 10) % 100).toString().padStart(2, '0'); }
+
+    // --- LOGICA DEL MONITOR ---
+    function agregarPedido() {
+        let nombre = document.getElementById('mon-cliente').value.trim(), cant = parseInt(document.getElementById('mon-cant').value) || 1;
+        if(nombre === "") { alert("Ingresa el nombre del cliente."); return; }
+        
+        let nuevo = { id: Date.now(), cliente: nombre, cantidad: cant, entregado: false };
+        
+        if(navigator.onLine) {
+            database.ref('pedidos/' + nuevo.id).set(nuevo);
+        } else {
+            let cola = JSON.parse(localStorage.getItem('bunker_pedidos')) || [];
+            cola.push(nuevo); localStorage.setItem('bunker_pedidos', JSON.stringify(cola));
+            dbPedidos.push(nuevo); renderizarPedidos(); 
+            alert("📵 Guardado en el teléfono. Se subirá a Patricia al recuperar señal.");
+        }
+        
+        document.getElementById('mon-cliente').value = ""; document.getElementById('mon-cant').value = "1";
+    }
+
+    function togglePedido(id, estado) { if(navigator.onLine) database.ref('pedidos/' + id).update({ entregado: !estado }); else alert("Debes tener internet para marcar como entregado."); }
+    function borrarPedido(id) { if(navigator.onLine) { if(confirm("¿Eliminar cliente?")) database.ref('pedidos/' + id).remove(); } else alert("Debes tener internet para eliminar un pedido."); }
+    function limpiarPedidos() { if(navigator.onLine) { if(confirm("⚠️ ¿Vaciar la lista para la próxima semana?")) database.ref('pedidos').remove(); } else alert("Conéctate a internet para vaciar la lista."); }
+
+    function renderizarPedidos() {
+        const div = document.getElementById('lista-pedidos'); div.innerHTML = ""; let total = 0;
+        if (dbPedidos.length === 0) div.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-style:italic;'>No hay preventas registradas.</p>";
+        else {
+            dbPedidos.forEach(p => {
+                total += p.cantidad;
+                div.innerHTML += `<div class="ingrediente-row" style="${p.entregado ? 'background:#d4edda;border-color:#c3e6cb;':'background:white;'} align-items:center; display:flex; flex-direction:row; gap:10px;">
+                    <div class="pedido-tachable" style="${p.entregado ? 'text-decoration:line-through;color:#6c757d;':'color:#2c3e50;'}" onclick="togglePedido(${p.id}, ${p.entregado})">
+                        <strong style="display:block; font-size:18px;">${p.entregado ? '✅' : '📦'} ${p.cliente}</strong><span style="font-size:14px; margin-left:28px;">Solicitó: <b>${p.cantidad}</b> pasticho(s)</span>
+                    </div><button class="btn btn-delete" onclick="borrarPedido(${p.id})">❌</button></div>`;
+            });
+        }
+        document.getElementById('total-reservados').innerText = total;
+    }
+
+    // --- LOGICA DE FACTURACIÓN ---
+    function generarReciboWA() {
+        let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente", cant = parseInt(document.getElementById('fac-cant').value) || 1, precioUSD = parsearMoneda(document.getElementById('fac-precio').value), deliveryBs = parsearMoneda(document.getElementById('fac-delivery').value), tasa = parsearMoneda(document.getElementById('fac-tasa').value);
+        if(tasa <= 0) { alert("Ingresa la tasa BCV."); return; }
+        let totalUSD = Math.round(((cant * precioUSD) + (deliveryBs / tasa)) * 100) / 100, totalBs = totalUSD * tasa;
+        let msg = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n👤 *Cliente:* ${cliente}\n📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precioUSD)}\n`;
+        if(deliveryBs > 0) msg += `🛵 *Delivery:* ${floatAFormatoMoneda(deliveryBs)} Bs\n`;
+        msg += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD)}*\n🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n_(Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n¡Gracias por preferirnos! 🍕\n\n💳 *PAGO MÓVIL BANESCO* 👇\n0134 04248536405 31074703`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function crearFilaHTML(nombre, esFijo, idUnico) { let esIva = (nombre === "I.V.A. (16%)"); return `<div class="ingrediente-row" id="row-${idUnico}" style="${esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : ""}"><label style="${esIva ? "color: #856404; font-weight: bold;" : ""}">${esIva ? '🧾 ' : ''}${nombre}</label><div class="ingreso-wrapper"><input type="text" class="monto-input" data-nombre="${nombre}" data-tipo="${esFijo ? 'fijo' : 'nuevo'}" oninput="formatearMoneda(event)" placeholder="0,00"><button class="btn btn-delete" onclick="borrarFila('row-${idUnico}', ${esFijo})" title="Borrar">❌</button></div></div>`; }
+    function cargarListasLimpias() { document.getElementById('lista-factura').innerHTML = ""; document.getElementById('lista-adicionales').innerHTML = ""; fFacturaBase.forEach((ing, i) => document.getElementById('lista-factura').innerHTML += crearFilaHTML(ing, true, 'F'+i)); fAdicionalesBase.forEach((ing, i) => document.getElementById('lista-adicionales').innerHTML += crearFilaHTML(ing, true, 'A'+i)); }
+
+    window.onload = () => { cargarListasLimpias(); document.getElementById('fecha').value = obtenerFechaLocal(); document.getElementById('fecha').addEventListener('change', buscarTasa); buscarTasa(); chequearInternet(); };
+
+    async function buscarTasa() {
+        let iF = document.getElementById('fecha').value, iT = document.getElementById('tasa'), ind = document.getElementById('indicador-tasa');
+        if (!iF) return; ind.style.display = 'none';
+        if (iF === obtenerFechaLocal() && navigator.onLine) {
+            iT.placeholder = "Buscando..."; iT.value = "";
+            try { let res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial'); let data = await res.json();
+                if (data.promedio) { iT.value = floatAFormatoMoneda(data.promedio); ind.innerText = "✓ BCV Oficial (En vivo)"; ind.style.display = 'block'; return; }
+            } catch(e) { iT.placeholder = "0,00"; }
+        } 
+        if (dbTasas[iF]) { iT.value = floatAFormatoMoneda(dbTasas[iF]); ind.innerText = "✓ Tasa en Memoria"; ind.style.display = 'block'; return; }
+        iT.value = ""; iT.placeholder = "0,00";
+    }
+
+    function agregarItem(id, esFijo) { let n = prompt("Nombre:"); if (n && n.trim()) document.getElementById(id).insertAdjacentHTML('beforeend', crearFilaHTML(n, esFijo, 'N'+Date.now())); }
+    function borrarFila(id, esFijo) { if (esFijo) document.querySelector(`#${id} input`).value = ""; else document.getElementById(id).remove(); }
+    function limpiarTodo() { if(confirm("¿Borrar precios?")) { document.querySelectorAll('.monto-input, #deliveryBs').forEach(i => i.value = ""); buscarTasa(); } }
+
+    function calcularYGuardar() {
+        let fecha = document.getElementById('fecha').value, tasa = parsearMoneda(document.getElementById('tasa').value);
+        if (tasa <= 0) { alert("¡Falta la tasa!"); return; }
+        let dF = [], dA = [], tF = 0, tA = 0;
+        document.querySelectorAll('#lista-factura .monto-input').forEach(i => { let v = parsearMoneda(i.value); if (v > 0) { dF.push({ nombre: i.dataset.nombre, bs: v }); tF += v; } });
+        document.querySelectorAll('#lista-adicionales .monto-input').forEach(i => { let v = parsearMoneda(i.value); if (v > 0) { dA.push({ nombre: i.dataset.nombre, bs: v }); tA += v; } });
+        if(tF === 0 && tA === 0) { alert("No hay gastos."); return; }
+        let cP = parseFloat(document.getElementById('cantPastichos').value) || 0, pP = parsearMoneda(document.getElementById('precioPasticho').value), dB = parsearMoneda(document.getElementById('deliveryBs').value);
+        let gUSD = ((cP * pP) + (dB / tasa)) - ((tF + tA) / tasa);
+        dbTasas[fecha] = tasa; localStorage.setItem('tasasBCV_Memoria', JSON.stringify(dbTasas));
+        
+        let registro = { id: Date.now(), fecha: fecha, tasa: tasa, factura: dF, adicionales: dA, totalGastosBs: (tF + tA), totalGastosUSD: ((tF + tA) / tasa), cantP: cP, precioP: pP, deliveryBs: dB, ingresosUSD: ((cP * pP) + (dB / tasa)), gananciaUSD: gUSD };
+
+        if(navigator.onLine) {
+            database.ref('historial/' + registro.id).set(registro);
+            alert(`☁️ ¡Enviado a la Nube!\nGanancia: $${gUSD.toFixed(2)}`);
+        } else {
+            let cola = JSON.parse(localStorage.getItem('bunker_historial')) || [];
+            cola.push(registro); localStorage.setItem('bunker_historial', JSON.stringify(cola));
+            dbHistorial.push(registro); renderizarHistorial(); 
+            alert(`📵 ¡Guardado en Modo Búnker!\nGanancia: $${gUSD.toFixed(2)}\nSe enviará a la Nube en cuanto recuperes el internet.`);
+        }
+        limpiarTodo(); cargarListasLimpias(); cambiarPestana('historial');
+    }
+
+    // --- RENDERIZADO DEL HISTORIAL CON BOTONES RESTAURADOS ---
+    function renderizarHistorial() {
+        const divH = document.getElementById('contenedor-historial'); divH.innerHTML = "";
+        if (dbHistorial.length === 0) { divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>La Nube está vacía.</h3>"; return; }
+        [...dbHistorial].reverse().forEach(r => {
+            let hF = `<div class="detalles-box"><strong>🧾 Factura Principal</strong><br>`, hA = `<div class="detalles-box"><strong>➕ Gastos Adicionales</strong><br>`;
+            r.factura.forEach(f => hF += `<div class="item-line" ${f.nombre==="I.V.A. (16%)"?'style="font-weight:bold;color:#856404;background:#fff3cd;"':''}><span>${f.nombre}</span> <span>${f.bs.toLocaleString('es-VE')} Bs</span></div>`); hF += `</div>`;
+            r.adicionales.forEach(a => hA += `<div class="item-line"><span>${a.nombre}</span> <span>${a.bs.toLocaleString('es-VE')} Bs</span></div>`); hA += `</div>`;
+            divH.innerHTML += `<div class="factura-card"><div class="factura-header"><span class="factura-title">📅 ${r.fecha}</span><div class="header-right"><span style="font-weight:bold;">Tasa: ${r.tasa.toLocaleString('es-VE')} Bs</span><button class="btn btn-editar-historial" onclick="editarRegistroHistorial(${r.id})">✏️ Editar</button><button class="btn btn-eliminar-historial" onclick="borrarRegistroHistorial(${r.id})">❌ Borrar</button></div></div><div class="factura-details">${hF}${hA}<div class="totales-box"><strong>📊 Resumen</strong><div style="margin-top:10px;">Inversión: $${r.totalGastosUSD.toFixed(2)}</div><div>Ingresos: $${r.ingresosUSD.toFixed(2)}</div><div class="ganancia-text">Ganancia: $${r.gananciaUSD.toFixed(2)}</div></div></div></div>`;
+        });
+    }
+
+    // --- FUNCIONES DE EDICIÓN Y BORRADO RESTAURADAS CON SEGURO OFFLINE ---
+    function editarRegistroHistorial(id) {
+        if(!navigator.onLine) { alert("Conéctate a internet para poder editar facturas."); return; }
+        let reg = dbHistorial.find(r => r.id === id); if(!reg || !confirm("Devolver datos para corregir. ¿Continuar?")) return;
+        document.getElementById('fecha').value = reg.fecha; document.getElementById('tasa').value = floatAFormatoMoneda(reg.tasa);
+        document.getElementById('cantPastichos').value = reg.cantP || 10; document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 10); document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
+        cargarListasLimpias(); 
+        let poblar = (lista, cont) => { lista.forEach(i => {
+            let input = document.querySelector(`#${cont} input[data-nombre="${i.nombre}"]`);
+            if(!input) { document.getElementById(cont).insertAdjacentHTML('beforeend', crearFilaHTML(i.nombre, false, 'N'+Math.random())); input = document.querySelector(`#${cont} input[data-nombre="${i.nombre}"]`); }
+            input.value = Math.round(i.bs * 100).toString(); input.dispatchEvent(new Event('input', { bubbles: true }));
+        });};
+        poblar(reg.factura, 'lista-factura'); poblar(reg.adicionales, 'lista-adicionales');
+        database.ref('historial/' + id).remove(); cambiarPestana('registro'); window.scrollTo(0,0);
+    }
+
+    function borrarRegistroHistorial(id) {
+        if(navigator.onLine) { if(confirm("¿Eliminar registro de la Nube?")) database.ref('historial/' + id).remove(); } else { alert("Conéctate a internet para borrar facturas."); }
+    }
+
+    // --- MOTOR DE VOZ ---
+    let reconociendo = false, recognition;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'es-VE'; recognition.continuous = true; recognition.interimResults = false;
+        recognition.onstart = () => { reconociendo = true; document.getElementById('btn-microfono').innerHTML = "🔴 Escuchando..."; document.getElementById('btn-microfono').style.backgroundColor = "#c0392b"; };
+        recognition.onresult = (e) => {
+            let frase = e.results[e.results.length - 1][0].transcript.toLowerCase();
+            const mapa = [ { id: "Jamón", claves: ["jamón", "jamon"] }, { id: "Queso Mozarrella", claves: ["mozzarella", "mozarrela", "queso amarillo", "queso"] }, { id: "Queso Parmesano", claves: ["parmesano", "queso rallado"] }, { id: "Envases de Aluminio", claves: ["envase", "envases", "aluminio"] }, { id: "Pasta de tomate", claves: ["pasta de tomate", "salsa de tomate"] }, { id: "Pasta para pasticho", claves: ["pasta para pasticho", "láminas", "capri"] }, { id: "Mantequilla Mavesa", claves: ["mantequilla", "mavesa", "margarina"] }, { id: "Cubitos Maggi", claves: ["cubito", "cubitos", "maggi", "caldo"] }, { id: "Leche", claves: ["leche", "litro de leche"] }, { id: "Cucharillas", claves: ["cucharilla", "cucharillas", "plástico"] }, { id: "I.V.A. (16%)", claves: ["iva", "impuesto"] }, { id: "Carne molida", claves: ["carne", "molida"] }, { id: "Pan Campesino", claves: ["pan", "campesino", "panadería"] }, { id: "Nuez Moscada", claves: ["nuez", "moscada"] }, { id: "Aliños (Tomate/Cebolla/etc)", claves: ["aliño", "aliños", "cebolla", "tomate", "zanahoria", "cilantro", "pimentón"] } ];
+            mapa.forEach(item => { let match = item.claves.find(c => frase.includes(c)); if (match) { let num = frase.substring(frase.indexOf(match) + match.length).match(/^[^\d]*(\d+(?:[.,]\d+)?|\d+\s*(?:con|coma|punto|y)\s*\d+)/); if (num) { document.querySelectorAll('.monto-input').forEach(input => { if (input.dataset.nombre === item.id) { input.value = Math.round(parseFloat(num[1].replace(/\s+(con|coma|punto|y)\s+/g, '.').replace(',', '.')) * 100).toString(); input.dispatchEvent(new Event('input', { bubbles: true })); } }); } } });
+        };
+        recognition.onend = () => { reconociendo = false; document.getElementById('btn-microfono').innerHTML = "🎙️ Iniciar Dictado"; document.getElementById('btn-microfono').style.backgroundColor = "var(--voice)"; };
+    }
+    function iniciarDictado() { if (!recognition) { alert("Navegador no soporta voz."); return; } reconociendo ? recognition.stop() : recognition.start(); }
+
+    // --- RESPALDO ---
+    function exportarBaseDatos() { saveAs(new Blob([JSON.stringify({ historial: dbHistorial, tasas: dbTasas })], { type: "application/json" }), "Respaldo_Pastichos.json"); }
+    function importarBaseDatos(event) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                let data = JSON.parse(e.target.result);
+                if (data.historial) data.historial.forEach(reg => database.ref('historial/' + reg.id).set(reg));
+                if (data.tasas) { localStorage.setItem('tasasBCV_Memoria', JSON.stringify(data.tasas)); dbTasas = data.tasas; }
+                alert("¡Datos subidos a la Nube con éxito!");
+            } catch (err) { alert("Error al leer el archivo."); }
+        };
+        if(event.target.files[0]) reader.readAsText(event.target.files[0]);
+    }
+
+    // --- EXPORTADOR EXCEL ---
+    async function exportarExcel() {
+        if (typeof ExcelJS === 'undefined') { alert("Cargando..."); return; }
+        const wb = new ExcelJS.Workbook(), headerBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003366' } }, textWhite = { color: { argb: 'FFFFFFFF' }, bold: true }, center = { horizontal: 'center', vertical: 'middle' };
+        const ws1 = wb.addWorksheet("Resumen General"); ws1.mergeCells('A1:F1'); ws1.getCell('A1').value = "Control de Gastos de Inversión"; ws1.getCell('A1').font = { bold: true, size: 14 }; ws1.getCell('A1').alignment = center;
+        ws1.addRow(['Fecha', 'Tasa USD', 'Gastos Factura (Bs)', 'Gastos Adic. (Bs)', 'Total (Bs)', 'Total ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; }); ws1.columns = [{ width: 15 }, { width: 18 }, { width: 22 }, { width: 25 }, { width: 22 }, { width: 20 }];
+        dbHistorial.forEach(r => { let r1 = ws1.addRow([r.fecha, r.tasa, r.factura.reduce((s, i) => s + i.bs, 0), r.adicionales.reduce((s, i) => s + i.bs, 0), r.totalGastosBs, r.totalGastosUSD]); r1.getCell(2).numFmt = '#,##0.00 "Bs"'; r1.getCell(5).numFmt = '#,##0.00 "Bs"'; r1.getCell(6).numFmt = '"$"#,##0.00'; });
+        const ws2 = wb.addWorksheet("Desglose"); ws2.columns = [{ width: 35 }, { width: 20 }, { width: 20 }];
+        dbHistorial.forEach(reg => { ws2.addRow([`Compra ${reg.fecha}`, 'Monto (Bs)', 'Monto ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.font.bold = true; }); reg.factura.forEach(i => { let r = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]); r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00'; }); reg.adicionales.forEach(i => { let r = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]); r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00'; }); ws2.addRow([]); });
+        const ws3 = wb.addWorksheet("Rentabilidad"); ws3.columns = [{ width: 12 }, { width: 12 }, { width: 18 }, { width: 15 }, { width: 20 }, { width: 20 }, { width: 22 }, { width: 20 }, { width: 18 }, { width: 20 }];
+        ws3.addRow(['Fecha', 'Tasa USD', 'Gastos (Bs)', 'Gastos ($)', 'Prod.', 'Venta ($)', 'Delivery (Bs)', 'Delivery ($)', 'Ingresos ($)', 'GANANCIA ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
+        dbHistorial.forEach(r => { let r3 = ws3.addRow([r.fecha, r.tasa, r.totalGastosBs, r.totalGastosUSD, r.cantP, (r.cantP * r.precioP), r.deliveryBs, (r.deliveryBs / r.tasa), r.ingresosUSD, r.gananciaUSD]); r3.getCell(10).font = { bold: true, color: { argb: 'FF0000FF' } }; r3.getCell(10).numFmt = '"$"#,##0.00'; });
+        saveAs(new Blob([await wb.xlsx.writeBuffer()], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos_Nube.xlsx");
+    }
+
+    // --- INSTALACIÓN DEL SERVICE WORKER CON TU NUEVA MEJORA DE ACTUALIZACIÓN FORZADA ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registrado con éxito. Modo Búnker activado.');
+                // Tu truco para forzar actualización automática:
+                registration.update(); 
+            })
+            .catch(error => {
+                console.log('Error al registrar el ServiceWorker:', error);
+            });
+        });
+    }
+</script>
+</body>
+</html>
