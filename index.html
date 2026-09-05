@@ -11,7 +11,7 @@
     <!-- CONEXIÓN AL MANIFEST PARA MODO OFFLINE -->
     <link rel="manifest" href="manifest.json">
     
-    <title>App Pastichos 17.0</title>
+    <title>App Pastichos 18.0</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -94,7 +94,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 17.0</h1>
+        <h1>🍕 App Pastichos 18.0</h1>
         <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
@@ -310,7 +310,7 @@
         document.getElementById('total-reservados').innerText = total;
     }
 
-    // --- FACTURACIÓN Y EXCEL SE MANTIENEN INTACTOS ---
+    // --- LOGICA DE FACTURACIÓN ---
     function generarReciboWA() {
         let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente", cant = parseInt(document.getElementById('fac-cant').value) || 1, precioUSD = parsearMoneda(document.getElementById('fac-precio').value), deliveryBs = parsearMoneda(document.getElementById('fac-delivery').value), tasa = parsearMoneda(document.getElementById('fac-tasa').value);
         if(tasa <= 0) { alert("Ingresa la tasa BCV."); return; }
