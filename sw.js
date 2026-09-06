@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pastichos-bunker-v18-1';
+const CACHE_NAME = 'pastichos-bunker-v19';
 const urlsToCache = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting(); // ÓRDEN NUEVA: El nuevo vigía toma el control de inmediato, sin esperar.
+  self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
@@ -38,5 +38,5 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  self.clients.claim(); // ÓRDEN NUEVA: Aplica la nueva versión a todas las pantallas abiertas.
+  self.clients.claim(); 
 });
