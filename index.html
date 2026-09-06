@@ -10,7 +10,7 @@
     
     <link rel="manifest" href="manifest.json">
     
-    <title>App Pastichos 19.0</title>
+    <title>App Pastichos 20.0</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -93,7 +93,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 19.0</h1>
+        <h1>🍕 App Pastichos 20.0</h1>
         <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
@@ -144,29 +144,25 @@
         <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 GUARDAR EN LA NUBE</button>
     </div>
 
-    <!-- PESTAÑA 2: MONITOR DE PEDIDOS -->
+    <!-- PESTAÑA 2: MONITOR DE PEDIDOS (NUEVA VERSIÓN 20.0) -->
     <div id="monitor" class="tab-content">
         <div class="seccion">
             <h3>📋 Preventa y Reservas (Múltiples Lotes)</h3>
             <div style="background: #ebf5fb; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d6eaf8; margin-bottom: 20px;">
-                <span style="font-size: 18px; color: #2c3e50;">Total General Pastichos Reservados:</span><br>
+                <span style="font-size: 18px; color: #2c3e50;">Total General (Faltan por entregar):</span><br>
                 <span id="total-reservados" style="font-size: 32px; font-weight: bold; color: var(--secondary);">0</span>
             </div>
-            
-            <!-- NUEVA ESTRUCTURA PARA EL INGRESO DE FECHAS EN EL MONITOR -->
             <div class="fila" style="align-items: flex-end;">
                 <div class="campo" style="flex: 1;"><label>Fecha Entrega:</label><input type="date" id="mon-fecha"></div>
                 <div class="campo" style="flex: 2;"><label>Nombre del Cliente:</label><input type="text" id="mon-cliente" placeholder="Ej: Scarlit Sánchez"></div>
                 <div class="campo" style="flex: 1;"><label>Cantidad:</label><input type="number" id="mon-cant" value="1" min="1"></div>
                 <div class="campo" style="flex: 1;"><button class="btn btn-add" style="margin:0; padding:12px; height: 44px;" onclick="agregarPedido()">➕ Anotar</button></div>
             </div>
-
             <div style="margin-top: 20px;">
                 <h4 style="color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Lista de Clientes Organizada</h4>
                 <!-- AQUI SE RENDERIZARÁN LOS GRUPOS POR FECHA -->
                 <div id="lista-pedidos"></div>
             </div>
-            <button class="btn btn-clear-all" onclick="limpiarPedidos()" style="margin-top: 30px;">🗑️ BORRAR TODA LA LISTA</button>
         </div>
     </div>
 
@@ -223,7 +219,7 @@
     window.addEventListener('online', chequearInternet);
     window.addEventListener('offline', chequearInternet);
 
-    // --- ☁️ CONEXIÓN A FIREBASE ---
+    // --- ☁️ CONEXIÓN A FIREBASE REAL ---
     const firebaseConfig = {
         apiKey: "AIzaSyDjpLoYht4eQUNAl3xugp0URv7cmiXFS7Q", authDomain: "app-pastichos.firebaseapp.com",
         databaseURL: "https://app-pastichos-default-rtdb.firebaseio.com", projectId: "app-pastichos",
@@ -269,15 +265,16 @@
     function parsearMoneda(v) { return parseFloat((v || "").replace(/\./g, '').replace(',', '.')) || 0; }
     function formatearMoneda(e) { let val = e.target.value.replace(/\D/g, ''); if (val === '') { e.target.value = ''; return; } e.target.value = Math.floor(parseInt(val, 10) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + (parseInt(val, 10) % 100).toString().padStart(2, '0'); }
 
-    // --- LOGICA DEL MONITOR ACTUALIZADA A LA V19 ---
+    // --- LOGICA DEL MONITOR ACTUALIZADA V20 (LOTES, CONTADOR INTELIGENTE Y ARCHIVADO) ---
     function agregarPedido() {
         let nombre = document.getElementById('mon-cliente').value.trim();
-        let fecha = document.getElementById('mon-fecha').value;
         let cant = parseInt(document.getElementById('mon-cant').value) || 1;
+        let fecha = document.getElementById('mon-fecha').value; 
         
-        if(nombre === "" || fecha === "") { alert("Ingresa la fecha y el nombre del cliente."); return; }
+        if(nombre === "") { alert("Ingresa el nombre del cliente."); return; }
+        if(fecha === "") { fecha = obtenerFechaLocal(); }
         
-        let nuevo = { id: Date.now(), fecha: fecha, cliente: nombre, cantidad: cant, entregado: false };
+        let nuevo = { id: Date.now(), cliente: nombre, cantidad: cant, entregado: false, fecha: fecha };
         
         if(navigator.onLine) {
             database.ref('pedidos/' + nuevo.id).set(nuevo);
@@ -293,12 +290,22 @@
 
     function togglePedido(id, estado) { if(navigator.onLine) database.ref('pedidos/' + id).update({ entregado: !estado }); else alert("Debes tener internet para marcar como entregado."); }
     function borrarPedido(id) { if(navigator.onLine) { if(confirm("¿Eliminar cliente?")) database.ref('pedidos/' + id).remove(); } else alert("Debes tener internet para eliminar un pedido."); }
-    function limpiarPedidos() { if(navigator.onLine) { if(confirm("⚠️ ¿Estás seguro de vaciar absolutamente toda la lista?")) database.ref('pedidos').remove(); } else alert("Conéctate a internet para vaciar la lista."); }
+    
+    // Función de la Opción 3: Archivar un Lote Completo
+    function archivarLote(fechaTarget) {
+        if(!navigator.onLine) { alert("Conéctate a internet para archivar un lote."); return; }
+        if(confirm(`¿Estás seguro de archivar/eliminar todo el lote del ${fechaTarget}? Esto no se puede deshacer.`)) {
+            const itemsAArchivar = dbPedidos.filter(p => (p.fecha || 'Sin fecha asignada') === fechaTarget);
+            itemsAArchivar.forEach(p => {
+                database.ref('pedidos/' + p.id).remove();
+            });
+        }
+    }
 
     function renderizarPedidos() {
         const div = document.getElementById('lista-pedidos'); 
         div.innerHTML = ""; 
-        let total = 0;
+        let totalGeneralActivo = 0; // Opción 2: Contador Inteligente Global
         
         if (dbPedidos.length === 0) {
             div.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-style:italic;'>No hay preventas registradas.</p>";
@@ -306,37 +313,52 @@
             return;
         }
 
-        // LÓGICA DE AGRUPACIÓN POR FECHAS V19
+        // Agrupación por fechas (Opción 1)
         const pedidosPorFecha = {};
         dbPedidos.forEach(p => {
-            total += p.cantidad;
-            // Medida de seguridad: Si el cliente de ayer no tiene fecha en Firebase, lo agrupa aquí.
-            let fecha = p.fecha || 'Sin fecha asignada'; 
-            if (!pedidosPorFecha[fecha]) pedidosPorFecha[fecha] = [];
-            pedidosPorFecha[fecha].push(p);
+            let f = p.fecha || 'Sin fecha asignada';
+            if (!pedidosPorFecha[f]) pedidosPorFecha[f] = { items: [], activos: 0 };
+            pedidosPorFecha[f].items.push(p);
+            // El contador inteligente solo suma si NO está entregado
+            if (!p.entregado) {
+                pedidosPorFecha[f].activos += p.cantidad;
+                totalGeneralActivo += p.cantidad; 
+            }
         });
 
-        const fechasOrdenadas = Object.keys(pedidosPorFecha).sort().reverse();
+        const fechasOrdenadas = Object.keys(pedidosPorFecha).sort().reverse(); 
 
         fechasOrdenadas.forEach(fecha => {
+            let lote = pedidosPorFecha[fecha];
             let etiquetaFecha = fecha;
             if (fecha !== 'Sin fecha asignada') {
-                const partes = fecha.split('-'); // Cambia 2026-09-08 a 08/09/2026
+                const partes = fecha.split('-'); 
                 if (partes.length === 3) etiquetaFecha = `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
 
-            let htmlGrupo = `<div style="margin-top: 20px; margin-bottom: 10px; background: #34495e; color: white; padding: 8px 15px; border-radius: 6px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📅 Lote del: ${etiquetaFecha}</div>`;
+            let htmlGrupo = `
+            <div style="margin-top: 25px; border: 1px solid #34495e; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="background: #34495e; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h4 style="margin: 0; font-size: 16px;">📅 Lote: ${etiquetaFecha} <br>
+                        <span style="font-size: 14px; color: #f1c40f; font-weight: normal;">(Faltan por entregar: <b>${lote.activos}</b> pastichos)</span>
+                    </h4>
+                    <button class="btn btn-delete" style="background: #e74c3c; width: auto; height: auto; border-radius: 6px; padding: 6px 12px; font-size: 12px;" onclick="archivarLote('${fecha}')">📦 Archivar Lote</button>
+                </div>
+                <div style="padding: 10px; background: #fdfdfd;">
+            `;
 
-            pedidosPorFecha[fecha].forEach(p => {
+            lote.items.forEach(p => {
                 htmlGrupo += `<div class="ingrediente-row" style="${p.entregado ? 'background:#d4edda;border-color:#c3e6cb;':'background:white;'} align-items:center; display:flex; flex-direction:row; gap:10px;">
                     <div class="pedido-tachable" style="${p.entregado ? 'text-decoration:line-through;color:#6c757d;':'color:#2c3e50;'}" onclick="togglePedido(${p.id}, ${p.entregado})">
                         <strong style="display:block; font-size:18px;">${p.entregado ? '✅' : '📦'} ${p.cliente}</strong><span style="font-size:14px; margin-left:28px;">Solicitó: <b>${p.cantidad}</b> pasticho(s)</span>
                     </div><button class="btn btn-delete" onclick="borrarPedido(${p.id})">❌</button></div>`;
             });
+
+            htmlGrupo += `</div></div>`;
             div.innerHTML += htmlGrupo;
         });
 
-        document.getElementById('total-reservados').innerText = total;
+        document.getElementById('total-reservados').innerText = totalGeneralActivo;
     }
 
     // --- LOGICA DE FACTURACIÓN ---
@@ -357,7 +379,7 @@
         cargarListasLimpias(); 
         let hoy = obtenerFechaLocal();
         document.getElementById('fecha').value = hoy; 
-        document.getElementById('mon-fecha').value = hoy; // Inicializa la fecha del monitor en hoy por defecto
+        document.getElementById('mon-fecha').value = hoy; // Carga la fecha de hoy por defecto en el monitor
         document.getElementById('fecha').addEventListener('change', buscarTasa); 
         buscarTasa(); 
         chequearInternet(); 
@@ -405,7 +427,7 @@
         limpiarTodo(); cargarListasLimpias(); cambiarPestana('historial');
     }
 
-    // --- RENDERIZADO DEL HISTORIAL ---
+    // --- RENDERIZADO DEL HISTORIAL CON BOTONES RESTAURADOS ---
     function renderizarHistorial() {
         const divH = document.getElementById('contenedor-historial'); divH.innerHTML = "";
         if (dbHistorial.length === 0) { divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>La Nube está vacía.</h3>"; return; }
@@ -417,7 +439,7 @@
         });
     }
 
-    // --- FUNCIONES DE EDICIÓN Y BORRADO ---
+    // --- FUNCIONES DE EDICIÓN Y BORRADO RESTAURADAS CON SEGURO OFFLINE ---
     function editarRegistroHistorial(id) {
         if(!navigator.onLine) { alert("Conéctate a internet para poder editar facturas."); return; }
         let reg = dbHistorial.find(r => r.id === id); if(!reg || !confirm("Devolver datos para corregir. ¿Continuar?")) return;
