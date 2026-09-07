@@ -10,7 +10,7 @@
     
     <link rel="manifest" href="manifest.json">
     
-    <title>App Pastichos 20.0</title>
+    <title>App Pastichos 21.0</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -93,7 +93,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 20.0</h1>
+        <h1>🍕 App Pastichos 21.0</h1>
         <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
@@ -144,7 +144,7 @@
         <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 GUARDAR EN LA NUBE</button>
     </div>
 
-    <!-- PESTAÑA 2: MONITOR DE PEDIDOS (NUEVA VERSIÓN 20.0) -->
+    <!-- PESTAÑA 2: MONITOR DE PEDIDOS (VERSIÓN 21 - LOTES Y CONTADORES) -->
     <div id="monitor" class="tab-content">
         <div class="seccion">
             <h3>📋 Preventa y Reservas (Múltiples Lotes)</h3>
@@ -160,7 +160,6 @@
             </div>
             <div style="margin-top: 20px;">
                 <h4 style="color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Lista de Clientes Organizada</h4>
-                <!-- AQUI SE RENDERIZARÁN LOS GRUPOS POR FECHA -->
                 <div id="lista-pedidos"></div>
             </div>
         </div>
@@ -265,7 +264,7 @@
     function parsearMoneda(v) { return parseFloat((v || "").replace(/\./g, '').replace(',', '.')) || 0; }
     function formatearMoneda(e) { let val = e.target.value.replace(/\D/g, ''); if (val === '') { e.target.value = ''; return; } e.target.value = Math.floor(parseInt(val, 10) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + (parseInt(val, 10) % 100).toString().padStart(2, '0'); }
 
-    // --- LOGICA DEL MONITOR ACTUALIZADA V20 (LOTES, CONTADOR INTELIGENTE Y ARCHIVADO) ---
+    // --- LOGICA DEL MONITOR ---
     function agregarPedido() {
         let nombre = document.getElementById('mon-cliente').value.trim();
         let cant = parseInt(document.getElementById('mon-cant').value) || 1;
@@ -291,21 +290,18 @@
     function togglePedido(id, estado) { if(navigator.onLine) database.ref('pedidos/' + id).update({ entregado: !estado }); else alert("Debes tener internet para marcar como entregado."); }
     function borrarPedido(id) { if(navigator.onLine) { if(confirm("¿Eliminar cliente?")) database.ref('pedidos/' + id).remove(); } else alert("Debes tener internet para eliminar un pedido."); }
     
-    // Función de la Opción 3: Archivar un Lote Completo
     function archivarLote(fechaTarget) {
         if(!navigator.onLine) { alert("Conéctate a internet para archivar un lote."); return; }
         if(confirm(`¿Estás seguro de archivar/eliminar todo el lote del ${fechaTarget}? Esto no se puede deshacer.`)) {
             const itemsAArchivar = dbPedidos.filter(p => (p.fecha || 'Sin fecha asignada') === fechaTarget);
-            itemsAArchivar.forEach(p => {
-                database.ref('pedidos/' + p.id).remove();
-            });
+            itemsAArchivar.forEach(p => { database.ref('pedidos/' + p.id).remove(); });
         }
     }
 
     function renderizarPedidos() {
         const div = document.getElementById('lista-pedidos'); 
         div.innerHTML = ""; 
-        let totalGeneralActivo = 0; // Opción 2: Contador Inteligente Global
+        let totalGeneralActivo = 0; 
         
         if (dbPedidos.length === 0) {
             div.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-style:italic;'>No hay preventas registradas.</p>";
@@ -313,13 +309,11 @@
             return;
         }
 
-        // Agrupación por fechas (Opción 1)
         const pedidosPorFecha = {};
         dbPedidos.forEach(p => {
             let f = p.fecha || 'Sin fecha asignada';
             if (!pedidosPorFecha[f]) pedidosPorFecha[f] = { items: [], activos: 0 };
             pedidosPorFecha[f].items.push(p);
-            // El contador inteligente solo suma si NO está entregado
             if (!p.entregado) {
                 pedidosPorFecha[f].activos += p.cantidad;
                 totalGeneralActivo += p.cantidad; 
@@ -361,14 +355,16 @@
         document.getElementById('total-reservados').innerText = totalGeneralActivo;
     }
 
-    // --- LOGICA DE FACTURACIÓN ---
+    // --- LOGICA DE FACTURACIÓN (NUEVA VERSIÓN 21 - FORMATO VERTICAL PARA PAGO MOVIL) ---
     function generarReciboWA() {
         let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente", cant = parseInt(document.getElementById('fac-cant').value) || 1, precioUSD = parsearMoneda(document.getElementById('fac-precio').value), deliveryBs = parsearMoneda(document.getElementById('fac-delivery').value), tasa = parsearMoneda(document.getElementById('fac-tasa').value);
         if(tasa <= 0) { alert("Ingresa la tasa BCV."); return; }
         let totalUSD = Math.round(((cant * precioUSD) + (deliveryBs / tasa)) * 100) / 100, totalBs = totalUSD * tasa;
         let msg = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n👤 *Cliente:* ${cliente}\n📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precioUSD)}\n`;
         if(deliveryBs > 0) msg += `🛵 *Delivery:* ${floatAFormatoMoneda(deliveryBs)} Bs\n`;
-        msg += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD)}*\n🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n_(Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n¡Gracias por preferirnos! 🍕\n\n💳 *PAGO MÓVIL BANESCO* 👇\n0134 04248536405 31074703`;
+        
+        msg += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD)}*\n🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n_(Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n¡Gracias por preferirnos! 🍕\n\n💳 *PAGO MÓVIL BANESCO* 👇\n🏦 Banco: 0134\n📱 Cel: 04248536405\n🪪 C.I: 31074703`;
+        
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
@@ -379,7 +375,7 @@
         cargarListasLimpias(); 
         let hoy = obtenerFechaLocal();
         document.getElementById('fecha').value = hoy; 
-        document.getElementById('mon-fecha').value = hoy; // Carga la fecha de hoy por defecto en el monitor
+        document.getElementById('mon-fecha').value = hoy; 
         document.getElementById('fecha').addEventListener('change', buscarTasa); 
         buscarTasa(); 
         chequearInternet(); 
@@ -427,7 +423,6 @@
         limpiarTodo(); cargarListasLimpias(); cambiarPestana('historial');
     }
 
-    // --- RENDERIZADO DEL HISTORIAL CON BOTONES RESTAURADOS ---
     function renderizarHistorial() {
         const divH = document.getElementById('contenedor-historial'); divH.innerHTML = "";
         if (dbHistorial.length === 0) { divH.innerHTML = "<h3 style='text-align:center; color:#7f8c8d;'>La Nube está vacía.</h3>"; return; }
@@ -439,7 +434,6 @@
         });
     }
 
-    // --- FUNCIONES DE EDICIÓN Y BORRADO RESTAURADAS CON SEGURO OFFLINE ---
     function editarRegistroHistorial(id) {
         if(!navigator.onLine) { alert("Conéctate a internet para poder editar facturas."); return; }
         let reg = dbHistorial.find(r => r.id === id); if(!reg || !confirm("Devolver datos para corregir. ¿Continuar?")) return;
@@ -459,7 +453,6 @@
         if(navigator.onLine) { if(confirm("¿Eliminar registro de la Nube?")) database.ref('historial/' + id).remove(); } else { alert("Conéctate a internet para borrar facturas."); }
     }
 
-    // --- MOTOR DE VOZ ---
     let reconociendo = false, recognition;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -474,7 +467,6 @@
     }
     function iniciarDictado() { if (!recognition) { alert("Navegador no soporta voz."); return; } reconociendo ? recognition.stop() : recognition.start(); }
 
-    // --- RESPALDO ---
     function exportarBaseDatos() { saveAs(new Blob([JSON.stringify({ historial: dbHistorial, tasas: dbTasas })], { type: "application/json" }), "Respaldo_Pastichos.json"); }
     function importarBaseDatos(event) {
         let reader = new FileReader();
@@ -489,7 +481,6 @@
         if(event.target.files[0]) reader.readAsText(event.target.files[0]);
     }
 
-    // --- EXPORTADOR EXCEL ---
     async function exportarExcel() {
         if (typeof ExcelJS === 'undefined') { alert("Cargando..."); return; }
         const wb = new ExcelJS.Workbook(), headerBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003366' } }, textWhite = { color: { argb: 'FFFFFFFF' }, bold: true }, center = { horizontal: 'center', vertical: 'middle' };
@@ -504,7 +495,6 @@
         saveAs(new Blob([await wb.xlsx.writeBuffer()], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos_Nube.xlsx");
     }
 
-    // --- INSTALACIÓN DEL SERVICE WORKER (AUTO-ACTUALIZABLE) ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
