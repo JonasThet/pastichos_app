@@ -315,7 +315,7 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // --- CONSTRUCTOR Y GUARDADO (VERSIÓN 22.0) ---
+    // --- CONSTRUCTOR Y GUARDADO (VERSIÓN 22.0 CON BLINDAJE) ---
     function crearFilaHTML(nombre, esFijo, idUnico) { let esIva = (nombre === "I.V.A. (16%)"); return `<div class="ingrediente-row" id="row-${idUnico}" style="${esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : ""}"><label style="${esIva ? "color: #856404; font-weight: bold;" : ""}">${esIva ? '🧾 ' : ''}${nombre}</label><div class="ingreso-wrapper"><input type="text" class="monto-input" data-nombre="${nombre}" data-tipo="${esFijo ? 'fijo' : 'nuevo'}" oninput="formatearMoneda(event)" placeholder="0,00"><button class="btn btn-delete" onclick="borrarFila('row-${idUnico}', ${esFijo})" title="Borrar">❌</button></div></div>`; }
     function cargarListasLimpias() { document.getElementById('lista-factura').innerHTML = ""; document.getElementById('lista-adicionales').innerHTML = ""; fFacturaBase.forEach((ing, i) => document.getElementById('lista-factura').innerHTML += crearFilaHTML(ing, true, 'F'+i)); fAdicionalesBase.forEach((ing, i) => document.getElementById('lista-adicionales').innerHTML += crearFilaHTML(ing, true, 'A'+i)); }
 
