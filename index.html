@@ -10,7 +10,7 @@
     
     <link rel="manifest" href="manifest.json">
     
-    <title>App Pastichos 22.0</title>
+    <title>App Pastichos 23.0</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -51,7 +51,7 @@
         .btn-clear-all { background: var(--danger); width: 100%; padding: 12px; }
         .btn-delete { background: #e74c3c; padding: 8px; border-radius: 50%; font-size: 12px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
         .btn-calcular { background: #e67e22; width: 100%; font-size: 20px; padding: 18px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(230,126,34,0.3); }
-        .btn-excel { background: var(--accent); padding: 15px 25px; font-size: 16px; display: block; margin: 0 auto 10px auto; width: 100%; text-align: center; }
+        .btn-excel { background: var(--accent); padding: 15px 25px; font-size: 16px; display: block; margin: 0 auto 10px auto; width: 100%; text-align: center; text-transform: uppercase; }
         .btn-whatsapp { background: #25D366; width: 100%; font-size: 18px; padding: 15px; margin-top: 15px; text-transform: uppercase; }
         .factura-card { background: white; border: 2px dashed #bdc3c7; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
         .factura-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
@@ -66,8 +66,20 @@
         .item-line { display: flex; justify-content: space-between; font-size: 14px; border-bottom: 1px solid #eee; padding: 6px 0; }
         .respaldo-bar { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-respaldo { background: #7f8c8d; flex: 1; }
-        .pedido-tachable { flex: 1; cursor: pointer; transition: 0.2s; font-size: 16px; user-select: none; }
-        .pedido-tachable:active { opacity: 0.5; }
+        
+        /* ESTILOS DEL MONITOR V23 */
+        .cliente-card { background: white; border: 1px solid #eee; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: 0.3s; }
+        .cliente-info h4 { margin: 0 0 5px 0; color: var(--primary); font-size: 16px; }
+        .cliente-info p { margin: 0; font-size: 13px; color: #666; }
+        .cliente-acciones { display: flex; gap: 10px; align-items: center; }
+        .btn-abonar { background: #f39c12; font-size: 12px; padding: 8px 12px; border-radius: 6px; color: white; border: none; font-weight: bold; cursor: pointer;}
+        .btn-abonar:hover { background: #e67e22; }
+        .estado-pago { font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-top: 5px; display: inline-block; }
+        .pago-parcial { background: #fcf3cf; color: #b9770e; border: 1px solid #f8c471; }
+        .card-pagada { background: #d4edda; border-color: #c3e6cb; }
+        .card-pagada .cliente-info h4 { text-decoration: line-through; color: #155724; }
+        .pago-completo { background: #c3e6cb; color: #155724; }
+
         @media (max-width: 768px) {
             body { padding: 0; background-color: white; } 
             .container { border-radius: 0; box-shadow: none; max-width: 100%; }
@@ -86,6 +98,8 @@
             .header-right { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
             .btn-mic, .btn-calcular, .btn-whatsapp { font-size: 16px; padding: 15px; }
             .respaldo-bar { flex-direction: column; }
+            .cliente-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .cliente-acciones { width: 100%; justify-content: flex-end; }
         }
     </style>
 </head>
@@ -93,7 +107,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 22.0</h1>
+        <h1>🍕 App Pastichos 23.0</h1>
         <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
@@ -144,14 +158,10 @@
         <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 GUARDAR EN LA NUBE</button>
     </div>
 
-    <!-- PESTAÑA 2: MONITOR -->
+    <!-- PESTAÑA 2: MONITOR (VERSIÓN 23 - ABONOS Y SIN TOTAL GENERAL) -->
     <div id="monitor" class="tab-content">
         <div class="seccion">
             <h3>📋 Preventa y Reservas</h3>
-            <div style="background: #ebf5fb; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d6eaf8; margin-bottom: 20px;">
-                <span style="font-size: 18px; color: #2c3e50;">Total General (Faltan por entregar):</span><br>
-                <span id="total-reservados" style="font-size: 32px; font-weight: bold; color: var(--secondary);">0</span>
-            </div>
             <div class="fila" style="align-items: flex-end;">
                 <div class="campo" style="flex: 1;"><label>Fecha Entrega:</label><input type="date" id="mon-fecha"></div>
                 <div class="campo" style="flex: 2;"><label>Nombre del Cliente:</label><input type="text" id="mon-cliente" placeholder="Ej: Scarlit Sánchez"></div>
@@ -172,7 +182,7 @@
             <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Subir Datos</button>
             <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarBaseDatos(event)">
         </div>
-        <button class="btn btn-excel" onclick="exportarExcel()">📥 DESCARGAR EXCEL ELEGANTE</button>
+        <button class="btn btn-excel" onclick="exportarExcelV23()">📥 DESCARGAR EXCEL ELEGANTE (V23)</button>
         <div id="contenedor-historial"></div>
     </div>
 
@@ -205,7 +215,6 @@
 <script>
     // --- DETECCIÓN DE INTERNET ---
     const uiNube = document.getElementById('nube-status');
-    const dot = uiNube.querySelector('.dot');
     
     function chequearInternet() {
         if(navigator.onLine) {
@@ -232,6 +241,7 @@
     
     let dbHistorial = []; let dbPedidos = []; let dbTasas = JSON.parse(localStorage.getItem('tasasBCV_Memoria')) || {};
 
+    // RECUPERACIÓN DE TUS DATOS V22 (INCLUSO LOS VIEJOS)
     database.ref('historial').on('value', (snapshot) => { const data = snapshot.val(); dbHistorial = data ? Object.values(data).sort((a, b) => a.id - b.id) : []; renderizarHistorial(); });
     database.ref('pedidos').on('value', (snapshot) => { const data = snapshot.val(); dbPedidos = data ? Object.values(data).sort((a, b) => a.id - b.id) : []; renderizarPedidos(); });
 
@@ -264,12 +274,14 @@
     function parsearMoneda(v) { return parseFloat((v || "").replace(/\./g, '').replace(',', '.')) || 0; }
     function formatearMoneda(e) { let val = e.target.value.replace(/\D/g, ''); if (val === '') { e.target.value = ''; return; } e.target.value = Math.floor(parseInt(val, 10) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + (parseInt(val, 10) % 100).toString().padStart(2, '0'); }
 
-    // --- MONITOR DE PEDIDOS ---
+    // --- MONITOR DE PEDIDOS (VERSIÓN 23: SISTEMA DE ABONOS) ---
     function agregarPedido() {
         let nombre = document.getElementById('mon-cliente').value.trim(), cant = parseInt(document.getElementById('mon-cant').value) || 1, fecha = document.getElementById('mon-fecha').value; 
         if(nombre === "") { alert("Ingresa el nombre del cliente."); return; }
         if(fecha === "") { fecha = obtenerFechaLocal(); }
-        let nuevo = { id: Date.now(), cliente: nombre, cantidad: cant, entregado: false, fecha: fecha };
+        
+        let nuevo = { id: Date.now(), cliente: nombre, cantidad: cant, entregado: false, fecha: fecha, abonado: 0 };
+        
         if(navigator.onLine) { database.ref('pedidos/' + nuevo.id).set(nuevo); } else {
             let cola = JSON.parse(localStorage.getItem('bunker_pedidos')) || [];
             cola.push(nuevo); localStorage.setItem('bunker_pedidos', JSON.stringify(cola));
@@ -279,7 +291,25 @@
         document.getElementById('mon-cliente').value = ""; document.getElementById('mon-cant').value = "1";
     }
 
-    function togglePedido(id, estado) { if(navigator.onLine) database.ref('pedidos/' + id).update({ entregado: !estado }); else alert("Debes tener internet."); }
+    function abonarPedido(id) {
+        if(!navigator.onLine) { alert("Debes tener internet para registrar abonos."); return; }
+        let cliente = dbPedidos.find(c => c.id === id);
+        if(!cliente) return;
+        
+        let totalDeuda = cliente.cantidad * 10;
+        let pagoPrevio = cliente.abonado !== undefined ? cliente.abonado : (cliente.entregado ? totalDeuda : 0);
+
+        let montoStr = prompt(`💵 PAGOS PARA: ${cliente.cliente}\nEl pedido total cuesta: $${totalDeuda}\nYa ha abonado: $${pagoPrevio}\n\nIngresa el MONTO TOTAL ACUMULADO que ha pagado hasta ahora (en $):`, pagoPrevio);
+
+        if (montoStr !== null) {
+            let abono = parseFloat(montoStr.replace(',', '.'));
+            if (!isNaN(abono) && abono >= 0) {
+                let estaPagadoCompleto = abono >= totalDeuda;
+                database.ref('pedidos/' + id).update({ abonado: abono, entregado: estaPagadoCompleto });
+            } else alert("Monto inválido.");
+        }
+    }
+
     function borrarPedido(id) { if(navigator.onLine) { if(confirm("¿Eliminar cliente?")) database.ref('pedidos/' + id).remove(); } else alert("Debes tener internet."); }
     
     function archivarLote(fechaTarget) {
@@ -290,18 +320,52 @@
     }
 
     function renderizarPedidos() {
-        const div = document.getElementById('lista-pedidos'); div.innerHTML = ""; let totalGeneralActivo = 0; 
-        if (dbPedidos.length === 0) { div.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-style:italic;'>No hay preventas registradas.</p>"; document.getElementById('total-reservados').innerText = "0"; return; }
+        const div = document.getElementById('lista-pedidos'); div.innerHTML = ""; 
+        if (dbPedidos.length === 0) { div.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-style:italic;'>No hay preventas registradas.</p>"; return; }
+        
         const pedidosPorFecha = {};
-        dbPedidos.forEach(p => { let f = p.fecha || 'Sin fecha asignada'; if (!pedidosPorFecha[f]) pedidosPorFecha[f] = { items: [], activos: 0 }; pedidosPorFecha[f].items.push(p); if (!p.entregado) { pedidosPorFecha[f].activos += p.cantidad; totalGeneralActivo += p.cantidad; } });
+        dbPedidos.forEach(p => { 
+            let f = p.fecha || 'Sin fecha asignada'; 
+            if (!pedidosPorFecha[f]) pedidosPorFecha[f] = { items: [], activos: 0 }; 
+            pedidosPorFecha[f].items.push(p); 
+            
+            let totalDeuda = p.cantidad * 10;
+            let abono = p.abonado !== undefined ? p.abonado : (p.entregado ? totalDeuda : 0);
+            if (abono < totalDeuda) { pedidosPorFecha[f].activos += p.cantidad; } 
+        });
+
         Object.keys(pedidosPorFecha).sort().reverse().forEach(fecha => {
             let lote = pedidosPorFecha[fecha], etiquetaFecha = fecha;
             if (fecha !== 'Sin fecha asignada') { const partes = fecha.split('-'); if (partes.length === 3) etiquetaFecha = `${partes[2]}/${partes[1]}/${partes[0]}`; }
-            let htmlGrupo = `<div style="margin-top: 25px; border: 1px solid #34495e; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><div style="background: #34495e; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;"><h4 style="margin: 0; font-size: 16px;">📅 Lote: ${etiquetaFecha} <br><span style="font-size: 14px; color: #f1c40f; font-weight: normal;">(Faltan: <b>${lote.activos}</b> pastichos)</span></h4><button class="btn btn-delete" style="background: #e74c3c; width: auto; height: auto; border-radius: 6px; padding: 6px 12px; font-size: 12px;" onclick="archivarLote('${fecha}')">📦 Archivar</button></div><div style="padding: 10px; background: #fdfdfd;">`;
-            lote.items.forEach(p => { htmlGrupo += `<div class="ingrediente-row" style="${p.entregado ? 'background:#d4edda;border-color:#c3e6cb;':'background:white;'} align-items:center; display:flex; flex-direction:row; gap:10px;"><div class="pedido-tachable" style="${p.entregado ? 'text-decoration:line-through;color:#6c757d;':'color:#2c3e50;'}" onclick="togglePedido(${p.id}, ${p.entregado})"><strong style="display:block; font-size:18px;">${p.entregado ? '✅' : '📦'} ${p.cliente}</strong><span style="font-size:14px; margin-left:28px;">Solicitó: <b>${p.cantidad}</b> pasticho(s)</span></div><button class="btn btn-delete" onclick="borrarPedido(${p.id})">❌</button></div>`; });
+            
+            let htmlGrupo = `<div style="margin-top: 25px; border: 1px solid #34495e; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><div style="background: #34495e; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;"><h4 style="margin: 0; font-size: 16px;">📅 Lote: ${etiquetaFecha} <br><span style="font-size: 14px; color: #f1c40f; font-weight: normal;">(Faltan: <b>${lote.activos}</b> pastichos por cobrar)</span></h4><button class="btn btn-delete" style="background: #e74c3c; width: auto; height: auto; border-radius: 6px; padding: 6px 12px; font-size: 12px;" onclick="archivarLote('${fecha}')">📦 Archivar</button></div><div style="padding: 10px; background: #fdfdfd;">`;
+            
+            lote.items.forEach(p => { 
+                let totalDeuda = p.cantidad * 10;
+                let abono = p.abonado !== undefined ? p.abonado : (p.entregado ? totalDeuda : 0);
+                let pendiente = totalDeuda - abono;
+
+                let claseCard = "", htmlEstado = "";
+                if (abono >= totalDeuda) { claseCard = "card-pagada"; htmlEstado = `<div class="estado-pago pago-completo">✅ Pago Completo ($${abono})</div>`; }
+                else if (abono > 0) { htmlEstado = `<div class="estado-pago pago-parcial">⏳ Abonó: $${abono.toFixed(2)} | Pendiente: $${pendiente.toFixed(2)}</div>`; }
+                else { htmlEstado = `<div class="estado-pago" style="background:#eee; color:#666;">Debe: $${totalDeuda.toFixed(2)}</div>`; }
+
+                htmlGrupo += `
+                    <div class="cliente-card ${claseCard}">
+                        <div class="cliente-info">
+                            <h4>📦 ${p.cliente}</h4>
+                            <p>Solicitó: <strong>${p.cantidad}</strong> pasticho(s)</p>
+                            ${htmlEstado}
+                        </div>
+                        <div class="cliente-acciones">
+                            <button class="btn btn-abonar" onclick="abonarPedido(${p.id})">💰 Abonar</button>
+                            <button class="btn btn-delete" onclick="borrarPedido(${p.id})">❌</button>
+                        </div>
+                    </div>
+                `;
+            });
             div.innerHTML += htmlGrupo + `</div></div>`;
         });
-        document.getElementById('total-reservados').innerText = totalGeneralActivo;
     }
 
     // --- FACTURACIÓN ---
@@ -315,7 +379,7 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // --- CONSTRUCTOR Y GUARDADO (VERSIÓN 22.0 CON BLINDAJE) ---
+    // --- CONSTRUCTOR Y GUARDADO ---
     function crearFilaHTML(nombre, esFijo, idUnico) { let esIva = (nombre === "I.V.A. (16%)"); return `<div class="ingrediente-row" id="row-${idUnico}" style="${esIva ? "background: #fff3cd; border: 1px solid #ffe69c;" : ""}"><label style="${esIva ? "color: #856404; font-weight: bold;" : ""}">${esIva ? '🧾 ' : ''}${nombre}</label><div class="ingreso-wrapper"><input type="text" class="monto-input" data-nombre="${nombre}" data-tipo="${esFijo ? 'fijo' : 'nuevo'}" oninput="formatearMoneda(event)" placeholder="0,00"><button class="btn btn-delete" onclick="borrarFila('row-${idUnico}', ${esFijo})" title="Borrar">❌</button></div></div>`; }
     function cargarListasLimpias() { document.getElementById('lista-factura').innerHTML = ""; document.getElementById('lista-adicionales').innerHTML = ""; fFacturaBase.forEach((ing, i) => document.getElementById('lista-factura').innerHTML += crearFilaHTML(ing, true, 'F'+i)); fAdicionalesBase.forEach((ing, i) => document.getElementById('lista-adicionales').innerHTML += crearFilaHTML(ing, true, 'A'+i)); }
 
@@ -446,28 +510,155 @@
         if(event.target.files[0]) reader.readAsText(event.target.files[0]);
     }
 
-    async function exportarExcel() {
-        if (typeof ExcelJS === 'undefined') { alert("Cargando..."); return; }
-        const wb = new ExcelJS.Workbook(), headerBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003366' } }, textWhite = { color: { argb: 'FFFFFFFF' }, bold: true }, center = { horizontal: 'center', vertical: 'middle' };
+    // --- EXCEL V23.0 (4 PESTAÑAS Y SIN DECIMALES LARGOS) ---
+    async function exportarExcelV23() {
+        if (typeof ExcelJS === 'undefined') { alert("Cargando librerías de Excel, intenta en un segundo..."); return; }
+        if (dbHistorial.length === 0) { alert("No hay datos en el historial para exportar"); return; }
         
-        const ws1 = wb.addWorksheet("Resumen General"); ws1.mergeCells('A1:F1'); ws1.getCell('A1').value = "Control de Gastos de Inversión"; ws1.getCell('A1').font = { bold: true, size: 14 }; ws1.getCell('A1').alignment = center;
-        ws1.addRow(['Fecha', 'Tasa USD', 'Gastos Factura (Bs)', 'Gastos Adic. (Bs)', 'Total (Bs)', 'Total ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; }); ws1.columns = [{ width: 15 }, { width: 18 }, { width: 22 }, { width: 25 }, { width: 22 }, { width: 20 }];
+        const wb = new ExcelJS.Workbook();
         
-        dbHistorial.forEach(r => { let r1 = ws1.addRow([r.fecha, r.tasa, (r.factura || []).reduce((s, i) => s + i.bs, 0), (r.adicionales || []).reduce((s, i) => s + i.bs, 0), r.totalGastosBs, r.totalGastosUSD]); r1.getCell(2).numFmt = '#,##0.00 "Bs"'; r1.getCell(5).numFmt = '#,##0.00 "Bs"'; r1.getCell(6).numFmt = '"$"#,##0.00'; });
-        
-        const ws2 = wb.addWorksheet("Desglose"); ws2.columns = [{ width: 35 }, { width: 20 }, { width: 20 }];
-        dbHistorial.forEach(reg => { 
-            ws2.addRow([`Compra ${reg.fecha}`, 'Monto (Bs)', 'Monto ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.font.bold = true; }); 
-            (reg.factura || []).forEach(i => { let r = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]); r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00'; }); 
-            (reg.adicionales || []).forEach(i => { let r = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]); r.getCell(2).numFmt = '#,##0.00 "Bs"'; r.getCell(3).numFmt = '"$"#,##0.00'; }); 
-            ws2.addRow([]); 
+        const headerBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003366' } };
+        const headerGreen = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF274E13' } };
+        const textWhite = { color: { argb: 'FFFFFFFF' }, bold: true };
+        const textBlueGanancia = { color: { argb: 'FF0033CC' }, bold: true };
+        const center = { horizontal: 'center', vertical: 'middle' };
+
+        const ws1 = wb.addWorksheet("Resumen General");
+        ws1.columns = [{ key: 'a', width: 15 }, { key: 'b', width: 18 }, { key: 'c', width: 22 }, { key: 'd', width: 25 }, { key: 'e', width: 22 }, { key: 'f', width: 20 }];
+        ws1.mergeCells('A1:F1');
+        ws1.getCell('A1').value = 'Control de Gastos de Inversión (Pastichos)';
+        ws1.getCell('A1').font = { size: 14, bold: true };
+        ws1.getCell('A1').alignment = center;
+        ws1.addRow([]); 
+
+        let rH1 = ws1.addRow(['Fecha', 'Tasa USD (Bs)', 'Gastos Factura (Bs)', 'Gastos Adicionales (Bs)', 'Total Gastado (Bs)', 'Total Gastado ($)']);
+        rH1.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
+
+        let sBs1 = 0, sUsd1 = 0;
+        dbHistorial.forEach(reg => {
+            let fBs = (reg.factura || []).reduce((s, i) => s + i.bs, 0);
+            let aBs = (reg.adicionales || []).reduce((s, i) => s + i.bs, 0);
+            let row = ws1.addRow([reg.fecha, reg.tasa, fBs, aBs, reg.totalGastosBs, reg.totalGastosUSD]);
+            row.getCell(2).numFmt = '#,##0.00 "Bs"'; row.getCell(3).numFmt = '#,##0.00 "Bs"';
+            row.getCell(4).numFmt = '#,##0.00 "Bs"'; row.getCell(5).numFmt = '#,##0.00 "Bs"';
+            row.getCell(6).numFmt = '"$"#,##0.00';
+            sBs1 += reg.totalGastosBs; sUsd1 += reg.totalGastosUSD;
+        });
+
+        let rT1 = ws1.addRow(['', '', '', 'TOTAL GENERAL', sBs1, sUsd1]);
+        rT1.getCell(4).font = { bold: true }; rT1.getCell(4).alignment = { horizontal: 'right' };
+        rT1.getCell(5).font = { bold: true }; rT1.getCell(5).numFmt = '#,##0.00 "Bs"';
+        rT1.getCell(6).font = { bold: true }; rT1.getCell(6).numFmt = '"$"#,##0.00';
+
+        const ws2 = wb.addWorksheet("Desglose Detallado");
+        ws2.columns = [{ width: 40 }, { width: 22 }, { width: 22 }];
+        ws2.mergeCells('A1:C1');
+        ws2.getCell('A1').value = 'Desglose Específico por Día de Compra';
+        ws2.getCell('A1').font = { size: 14, bold: true };
+        ws2.getCell('A1').alignment = center;
+        ws2.addRow([]);
+
+        dbHistorial.forEach(reg => {
+            let rD = ws2.addRow([`Compra del ${reg.fecha} (Tasa: ${reg.tasa} Bs/$)`]);
+            ws2.mergeCells(`A${rD.number}:C${rD.number}`);
+            rD.getCell(1).fill = headerBlue; rD.getCell(1).font = textWhite;
+
+            let rS = ws2.addRow(['Descripción del Artículo', 'Monto (Bs)', 'Monto ($)']);
+            rS.eachCell(c => c.font = { bold: true });
+
+            let rF = ws2.addRow(['--- FACTURA PRINCIPAL ---']);
+            ws2.mergeCells(`A${rF.number}:C${rF.number}`);
+            rF.getCell(1).font = { bold: true, italic: true }; rF.getCell(1).alignment = center;
+
+            (reg.factura || []).forEach(i => {
+                let rI = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]);
+                rI.getCell(2).numFmt = '#,##0.00 "Bs"'; rI.getCell(3).numFmt = '"$"#,##0.00';
+            });
+
+            let rA = ws2.addRow(['--- GASTOS ADICIONALES ---']);
+            ws2.mergeCells(`A${rA.number}:C${rA.number}`);
+            rA.getCell(1).font = { bold: true, italic: true }; rA.getCell(1).alignment = center;
+
+            (reg.adicionales || []).forEach(i => {
+                let rI = ws2.addRow([i.nombre, i.bs, i.bs / reg.tasa]);
+                rI.getCell(2).numFmt = '#,##0.00 "Bs"'; rI.getCell(3).numFmt = '"$"#,##0.00';
+            });
+
+            let rT = ws2.addRow(['TOTAL DEL DÍA', reg.totalGastosBs, reg.totalGastosUSD]);
+            rT.eachCell(c => { c.font = { bold: true }; c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEAEEF2' }}; });
+            rT.getCell(2).numFmt = '#,##0.00 "Bs"'; rT.getCell(3).numFmt = '"$"#,##0.00';
+            ws2.addRow([]);
+        });
+
+        const ws3 = wb.addWorksheet("Rentabilidad");
+        ws3.columns = [{ width: 12 }, { width: 15 }, { width: 18 }, { width: 18 }, { width: 20 }, { width: 22 }, { width: 22 }, { width: 20 }, { width: 20 }, { width: 22 }];
+        ws3.mergeCells('A1:J1');
+        ws3.getCell('A1').value = 'Control de Ganancias por Producción';
+        ws3.getCell('A1').font = { size: 14, bold: true };
+        ws3.getCell('A1').alignment = center;
+        ws3.addRow([]);
+
+        let rH3 = ws3.addRow(['Fecha', 'Tasa USD', 'Total Gastos (Bs)', 'Total Gastos ($)', 'Pastichos Producidos', 'Venta Pastichos ($)', 'Ingreso Delivery (Bs)', 'Delivery en USD ($)', 'Total Ingresos ($)', 'GANANCIA NETA ($)']);
+        rH3.eachCell((c, i) => { c.font = textWhite; c.alignment = center; c.fill = (i <= 4) ? headerBlue : headerGreen; });
+
+        let sGas = 0, sIng = 0, sGan = 0;
+        dbHistorial.forEach(reg => {
+            let cant = reg.cantP || 10; let pre = reg.precioP || 10; let delBs = reg.deliveryBs || 0;
+            let row = ws3.addRow([reg.fecha, reg.tasa, reg.totalGastosBs, reg.totalGastosUSD, cant, (cant*pre), delBs, (delBs/reg.tasa), reg.ingresosUSD, reg.gananciaUSD]);
+            
+            row.getCell(2).numFmt = '#,##0.00'; row.getCell(3).numFmt = '#,##0.00 "Bs"'; row.getCell(4).numFmt = '"$"#,##0.00';
+            row.getCell(6).numFmt = '"$"#,##0.00'; row.getCell(7).numFmt = '#,##0.00 "Bs"'; row.getCell(8).numFmt = '"$"#,##0.00';
+            row.getCell(9).numFmt = '"$"#,##0.00'; row.getCell(10).numFmt = '"$"#,##0.00';
+            row.getCell(10).font = textBlueGanancia;
+
+            sGas += reg.totalGastosUSD; sIng += reg.ingresosUSD; sGan += reg.gananciaUSD;
+        });
+
+        let rT3 = ws3.addRow(['', '', 'TOTALES ACUMULADOS', sGas, '', '', '', '', sIng, sGan]);
+        rT3.eachCell(c => c.font = { bold: true });
+        rT3.getCell(4).numFmt = '"$"#,##0.00'; rT3.getCell(9).numFmt = '"$"#,##0.00'; rT3.getCell(10).numFmt = '"$"#,##0.00';
+        rT3.getCell(10).font = textBlueGanancia;
+
+        const ws4 = wb.addWorksheet("Matriz de Ingredientes");
+        let setIng = new Set();
+        dbHistorial.forEach(r => { 
+            (r.factura || []).forEach(i => setIng.add(i.nombre)); 
+            (r.adicionales || []).forEach(i => setIng.add(i.nombre)); 
         });
         
-        const ws3 = wb.addWorksheet("Rentabilidad"); ws3.columns = [{ width: 12 }, { width: 12 }, { width: 18 }, { width: 15 }, { width: 20 }, { width: 20 }, { width: 22 }, { width: 20 }, { width: 18 }, { width: 20 }];
-        ws3.addRow(['Fecha', 'Tasa USD', 'Gastos (Bs)', 'Gastos ($)', 'Prod.', 'Venta ($)', 'Delivery (Bs)', 'Delivery ($)', 'Ingresos ($)', 'GANANCIA ($)']).eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
-        dbHistorial.forEach(r => { let r3 = ws3.addRow([r.fecha, r.tasa, r.totalGastosBs, r.totalGastosUSD, r.cantP, (r.cantP * r.precioP), r.deliveryBs, (r.deliveryBs / r.tasa), r.ingresosUSD, r.gananciaUSD]); r3.getCell(10).font = { bold: true, color: { argb: 'FF0000FF' } }; r3.getCell(10).numFmt = '"$"#,##0.00'; });
-        
-        saveAs(new Blob([await wb.xlsx.writeBuffer()], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), "Control_Pastichos_Nube.xlsx");
+        let cols4 = [{ width: 25 }]; dbHistorial.forEach(() => cols4.push({ width: 15 }));
+        ws4.columns = cols4;
+
+        ws4.mergeCells(1, 1, 1, 1 + dbHistorial.length);
+        ws4.getCell('A1').value = 'Comparativa de Ingredientes Comprados por Día';
+        ws4.getCell('A1').font = { size: 14, bold: true };
+        ws4.getCell('A1').alignment = center;
+        ws4.addRow([]);
+
+        let headerMatriz = ['Ingrediente']; dbHistorial.forEach(r => headerMatriz.push(r.fecha));
+        let rH4 = ws4.addRow(headerMatriz);
+        rH4.eachCell(c => { c.fill = headerBlue; c.font = textWhite; c.alignment = center; });
+
+        Array.from(setIng).forEach(ing => {
+            let fila = [ing];
+            dbHistorial.forEach(r => {
+                let existe = (r.factura || []).some(i => i.nombre === ing) || (r.adicionales || []).some(i => i.nombre === ing);
+                fila.push(existe ? 'Sí' : 'No');
+            });
+            
+            let rM = ws4.addRow(fila);
+            rM.getCell(1).font = { bold: true };
+            rM.eachCell((c, i) => {
+                if (i > 1) {
+                    c.alignment = center;
+                    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: (c.value === 'Sí') ? 'FFD9EAD3' : 'FFF4CCCC' } }; 
+                }
+            });
+        });
+
+        const buffer = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, "Control_Gastos_Pastichos_Definitivo.xlsx");
     }
 
     if ('serviceWorker' in navigator) {
