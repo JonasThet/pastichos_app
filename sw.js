@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pastichos-cache-v23.0';
+const CACHE_NAME = 'pastichos-cache-v24.0';
 const urlsToCache = [
   '/',
   '/index.html',
