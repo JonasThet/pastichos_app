@@ -10,7 +10,7 @@
     
     <link rel="manifest" href="manifest.json">
     
-    <title>App Pastichos 23.0</title>
+    <title>App Pastichos 24.0</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -32,7 +32,7 @@
         .tab-content.active { display: block; }
         .seccion { background: #fdfdfd; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .seccion h3 { color: var(--secondary); border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-top: 0; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .fila { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
         .campo { display: flex; flex-direction: column; flex: 1; min-width: 130px; position: relative; }
         label { font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; }
@@ -67,7 +67,7 @@
         .respaldo-bar { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-respaldo { background: #7f8c8d; flex: 1; }
         
-        /* ESTILOS DEL MONITOR V23 */
+        /* ESTILOS DEL MONITOR V24 */
         .cliente-card { background: white; border: 1px solid #eee; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: 0.3s; }
         .cliente-info h4 { margin: 0 0 5px 0; color: var(--primary); font-size: 16px; }
         .cliente-info p { margin: 0; font-size: 13px; color: #666; }
@@ -76,9 +76,20 @@
         .btn-abonar:hover { background: #e67e22; }
         .estado-pago { font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-top: 5px; display: inline-block; }
         .pago-parcial { background: #fcf3cf; color: #b9770e; border: 1px solid #f8c471; }
+        .pago-mora { background: #fadbd8; color: #922b21; border: 1px solid #f5b7b1; }
         .card-pagada { background: #d4edda; border-color: #c3e6cb; }
         .card-pagada .cliente-info h4 { text-decoration: line-through; color: #155724; }
         .pago-completo { background: #c3e6cb; color: #155724; }
+        
+        .buscador-box { position: relative; margin-bottom: 20px; }
+        .buscador-box input { width: 100%; box-sizing: border-box; padding: 12px 40px 12px 15px; border: 2px solid #bdc3c7; border-radius: 8px; font-size: 15px; background: #fff; }
+        .buscador-box input:focus { border-color: var(--secondary); }
+        .btn-limpiar-busqueda { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; cursor: pointer; color: #7f8c8d; display: none; }
+
+        .delivery-toggle-box { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 8px 12px; border: 1px solid #ccd1d9; border-radius: 6px; height: 40px; box-sizing: border-box; }
+        .delivery-toggle-box input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; margin: 0; }
+        .btn-archivados-toggle { background: #8e44ad; font-size: 13px; padding: 8px 14px; border-radius: 6px; }
+        .btn-archivados-toggle:hover { background: #732d91; }
 
         @media (max-width: 768px) {
             body { padding: 0; background-color: white; } 
@@ -107,7 +118,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍕 App Pastichos 23.0</h1>
+        <h1>🍕 App Pastichos 24.0</h1>
         <div class="nube-status" id="nube-status"><span class="dot"></span> Conectado a la Nube</div>
     </div>
     
@@ -151,26 +162,80 @@
             <h3>4. Proyección de Ventas</h3>
             <div class="fila">
                 <div class="campo"><label>Cant. Pastichos a Vender:</label><input type="number" id="cantPastichos" value="10"></div>
-                <div class="campo"><label>Precio Venta c/u ($):</label><input type="text" id="precioPasticho" value="10,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Precio Venta c/u ($):</label><input type="text" id="precioPasticho" value="11,00" oninput="formatearMoneda(event)"></div>
                 <div class="campo"><label>Ingreso Delivery Total (Bs):</label><input type="text" id="deliveryBs" value="0,00" oninput="formatearMoneda(event)"></div>
             </div>
         </div>
         <button class="btn btn-calcular" onclick="calcularYGuardar()">💾 GUARDAR EN LA NUBE</button>
     </div>
 
-    <!-- PESTAÑA 2: MONITOR (VERSIÓN 23 - ABONOS Y SIN TOTAL GENERAL) -->
+    <!-- PESTAÑA 2: MONITOR (VERSIÓN 24.0) -->
     <div id="monitor" class="tab-content">
         <div class="seccion">
-            <h3>📋 Preventa y Reservas</h3>
-            <div class="fila" style="align-items: flex-end;">
-                <div class="campo" style="flex: 1;"><label>Fecha Entrega:</label><input type="date" id="mon-fecha"></div>
-                <div class="campo" style="flex: 2;"><label>Nombre del Cliente:</label><input type="text" id="mon-cliente" placeholder="Ej: Scarlit Sánchez"></div>
-                <div class="campo" style="flex: 1;"><label>Cantidad:</label><input type="number" id="mon-cant" value="1" min="1"></div>
-                <div class="campo" style="flex: 1;"><button class="btn btn-add" style="margin:0; padding:12px; height: 44px;" onclick="agregarPedido()">➕ Anotar</button></div>
+            <div class="top-bar" style="border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-bottom: 20px;">
+                <h3 style="border: none; margin: 0; padding: 0;">📋 Preventa y Reservas ($11.00 c/u)</h3>
+                <button class="btn btn-archivados-toggle" id="btn-ver-archivados" onclick="toggleVistaArchivados()">🗄️ Ver Listas Archivadas</button>
             </div>
-            <div style="margin-top: 20px;">
-                <h4 style="color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Lista de Clientes Organizada</h4>
-                <div id="lista-pedidos"></div>
+
+            <!-- VISTA DE LOTES ACTIVOS -->
+            <div id="vista-monitor-activos">
+                <!-- Barra de Búsqueda por Cliente -->
+                <div class="buscador-box">
+                    <input type="text" id="buscador-clientes" placeholder="🔍 Buscar cliente por nombre (ej: Patricia)..." oninput="filtrarMonitor()">
+                    <button class="btn-limpiar-busqueda" id="btn-limpiar-busqueda" onclick="limpiarBusquedaMonitor()">✖</button>
+                </div>
+
+                <!-- Formulario de Anotación V24 -->
+                <div class="fila" style="align-items: flex-end;">
+                    <div class="campo" style="flex: 1; min-width: 135px;">
+                        <label>Fecha Entrega:</label>
+                        <input type="date" id="mon-fecha" onchange="sugerirFechaCobro()">
+                    </div>
+                    <div class="campo" style="flex: 1; min-width: 135px;">
+                        <label>Fecha de Cobro:</label>
+                        <input type="date" id="mon-fecha-cobro">
+                    </div>
+                    <div class="campo" style="flex: 2; min-width: 180px;">
+                        <label>Nombre del Cliente:</label>
+                        <input type="text" id="mon-cliente" placeholder="Ej: Scarlit Sánchez">
+                    </div>
+                    <div class="campo" style="flex: 0.7; min-width: 80px;">
+                        <label>Cantidad:</label>
+                        <input type="number" id="mon-cant" value="1" min="1">
+                    </div>
+                </div>
+                <div class="fila" style="align-items: flex-end; margin-top: 10px;">
+                    <div class="campo" style="flex: 1; min-width: 160px;">
+                        <label>¿Debe Delivery?</label>
+                        <div class="delivery-toggle-box">
+                            <input type="checkbox" id="mon-tiene-delivery" onchange="toggleInputDelivery()">
+                            <span style="font-size: 14px; font-weight: 600; color: #2c3e50;">Sí, agregar delivery</span>
+                        </div>
+                    </div>
+                    <div class="campo" id="campo-monto-delivery" style="flex: 1; min-width: 130px; display: none;">
+                        <label>Monto Delivery ($):</label>
+                        <input type="text" id="mon-delivery-usd" value="1,20" oninput="formatearMoneda(event)">
+                    </div>
+                    <div class="campo" style="flex: 1.5; min-width: 150px;">
+                        <button class="btn btn-add" style="margin:0; padding:12px; height: 44px; width: 100%;" onclick="agregarPedido()">➕ Anotar Cliente</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <h4 style="color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Lista de Clientes Organizada</h4>
+                    <div id="lista-pedidos"></div>
+                </div>
+            </div>
+
+            <!-- VISTA DE LOTES ARCHIVADOS -->
+            <div id="vista-monitor-archivados" style="display: none;">
+                <div style="background: #f4ecf7; border: 1px solid #d7bde2; padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; color: #5b2c6f; font-size: 14px;">
+                    <strong>🗄️ Historial de Lotes Archivados:</strong> Aquí se guardan todas las listas que archives a partir de la Versión 24.0.
+                </div>
+                <div class="buscador-box">
+                    <input type="text" id="buscador-archivados" placeholder="🔍 Buscar cliente en listas archivadas..." oninput="renderizarPedidos()">
+                </div>
+                <div id="lista-pedidos-archivados"></div>
             </div>
         </div>
     </div>
@@ -182,11 +247,11 @@
             <button class="btn btn-respaldo" onclick="document.getElementById('importFile').click()">📂 Subir Datos</button>
             <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarBaseDatos(event)">
         </div>
-        <button class="btn btn-excel" onclick="exportarExcelV23()">📥 DESCARGAR EXCEL ELEGANTE (V23)</button>
+        <button class="btn btn-excel" onclick="exportarExcelV23()">📥 DESCARGAR EXCEL ELEGANTE (V24)</button>
         <div id="contenedor-historial"></div>
     </div>
 
-    <!-- PESTAÑA 4: FACTURACIÓN -->
+    <!-- PESTAÑA 4: FACTURACIÓN (VERSIÓN 24.0) -->
     <div id="facturacion" class="tab-content">
         <div class="seccion">
             <h3>🧾 Generar Recibo de Compra</h3>
@@ -195,8 +260,8 @@
                 <div class="campo"><label>Cantidad de Pastichos:</label><input type="number" id="fac-cant" value="1"></div>
             </div>
             <div class="fila">
-                <div class="campo"><label>Precio por Pasticho ($):</label><input type="text" id="fac-precio" value="10,00" oninput="formatearMoneda(event)"></div>
-                <div class="campo"><label>Costo de Delivery (Bs):</label><input type="text" id="fac-delivery" value="0,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Precio por Pasticho ($):</label><input type="text" id="fac-precio" value="11,00" oninput="formatearMoneda(event)"></div>
+                <div class="campo"><label>Costo de Delivery ($):</label><input type="text" id="fac-delivery" value="1,20" oninput="formatearMoneda(event)"></div>
             </div>
             <div class="fila">
                 <div class="campo">
@@ -213,6 +278,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
 
 <script>
+    const PRECIO_UNITARIO_PASTICHO = 11; // Precio oficial V24.0 ($11.00)
+
     // --- DETECCIÓN DE INTERNET ---
     const uiNube = document.getElementById('nube-status');
     
@@ -240,8 +307,9 @@
     const fAdicionalesBase = ["Carne molida", "Pan Campesino", "Nuez Moscada", "Aliños (Tomate/Cebolla/etc)"];
     
     let dbHistorial = []; let dbPedidos = []; let dbTasas = JSON.parse(localStorage.getItem('tasasBCV_Memoria')) || {};
+    let viendoArchivados = false;
 
-    // RECUPERACIÓN DE TUS DATOS V22 (INCLUSO LOS VIEJOS)
+    // RECUPERACIÓN DE DATOS INTACTA
     database.ref('historial').on('value', (snapshot) => { const data = snapshot.val(); dbHistorial = data ? Object.values(data).sort((a, b) => a.id - b.id) : []; renderizarHistorial(); });
     database.ref('pedidos').on('value', (snapshot) => { const data = snapshot.val(); dbPedidos = data ? Object.values(data).sort((a, b) => a.id - b.id) : []; renderizarPedidos(); });
 
@@ -274,21 +342,164 @@
     function parsearMoneda(v) { return parseFloat((v || "").replace(/\./g, '').replace(',', '.')) || 0; }
     function formatearMoneda(e) { let val = e.target.value.replace(/\D/g, ''); if (val === '') { e.target.value = ''; return; } e.target.value = Math.floor(parseInt(val, 10) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',' + (parseInt(val, 10) % 100).toString().padStart(2, '0'); }
 
-    // --- MONITOR DE PEDIDOS (VERSIÓN 23: SISTEMA DE ABONOS) ---
+    function formatearFechaVisual(fechaISO) {
+        if (!fechaISO || fechaISO === 'Sin fecha asignada') return 'Sin fecha asignada';
+        const p = fechaISO.split('-');
+        return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : fechaISO;
+    }
+
+    // Calcula sugerencia automática de cobro (15 o fin de mes: 28, 30, 31)
+    function calcularSugerenciaCobro(fechaBaseISO) {
+        if (!fechaBaseISO) return "";
+        const partes = fechaBaseISO.split('-');
+        if (partes.length !== 3) return "";
+        const anio = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10);
+        const dia = parseInt(partes[2], 10);
+        if (dia <= 15) {
+            return `${anio}-${String(mes).padStart(2, '0')}-15`;
+        } else {
+            const ultimoDia = new Date(anio, mes, 0).getDate();
+            return `${anio}-${String(mes).padStart(2, '0')}-${String(ultimoDia).padStart(2, '0')}`;
+        }
+    }
+
+    function sugerirFechaCobro() {
+        const fechaEntrega = document.getElementById('mon-fecha').value;
+        if (fechaEntrega) {
+            document.getElementById('mon-fecha-cobro').value = calcularSugerenciaCobro(fechaEntrega);
+        }
+    }
+
+    function toggleInputDelivery() {
+        const chk = document.getElementById('mon-tiene-delivery').checked;
+        const divMonto = document.getElementById('campo-monto-delivery');
+        divMonto.style.display = chk ? 'flex' : 'none';
+        if (chk && !document.getElementById('mon-delivery-usd').value) {
+            document.getElementById('mon-delivery-usd').value = "1,20";
+        }
+    }
+
+    function toggleVistaArchivados() {
+        viendoArchivados = !viendoArchivados;
+        const vistaActivos = document.getElementById('vista-monitor-activos');
+        const vistaArchivados = document.getElementById('vista-monitor-archivados');
+        const btn = document.getElementById('btn-ver-archivados');
+        if (viendoArchivados) {
+            vistaActivos.style.display = 'none';
+            vistaArchivados.style.display = 'block';
+            btn.innerHTML = '📋 Volver a Pedidos Activos';
+            btn.style.background = '#2980b9';
+        } else {
+            vistaActivos.style.display = 'block';
+            vistaArchivados.style.display = 'none';
+            btn.innerHTML = '🗄️ Ver Listas Archivadas';
+            btn.style.background = '#8e44ad';
+        }
+        renderizarPedidos();
+    }
+
+    function filtrarMonitor() {
+        const txt = document.getElementById('buscador-clientes').value;
+        document.getElementById('btn-limpiar-busqueda').style.display = txt.trim() !== "" ? 'block' : 'none';
+        renderizarPedidos();
+    }
+
+    function limpiarBusquedaMonitor() {
+        document.getElementById('buscador-clientes').value = "";
+        document.getElementById('btn-limpiar-busqueda').style.display = 'none';
+        renderizarPedidos();
+    }
+
+    // --- CÁLCULO INTELIGENTE DE DEUDA, DELIVERY Y RECARGO ($1/DÍA) ---
+    function calcularEstadoDeudaCliente(p) {
+        const costoPastichos = (p.cantidad || 1) * PRECIO_UNITARIO_PASTICHO;
+        const costoDelivery = parseFloat(p.deliveryUSD) || 0;
+        const deudaBase = costoPastichos + costoDelivery;
+        
+        let abono = p.abonado !== undefined ? parseFloat(p.abonado) : (p.entregado ? deudaBase : 0);
+        // Compatibilidad con clientes ya marcados como entregados en versiones previas
+        if (p.entregado && abono < deudaBase && p.abonado === undefined) {
+            abono = deudaBase;
+        }
+
+        let recargo = 0;
+        let diasRetraso = 0;
+
+        // Si el cliente ya hizo un abono (> 0) o canceló completo, el recargo se detiene/congela
+        if (p.recargoCongelado !== undefined) {
+            recargo = parseFloat(p.recargoCongelado) || 0;
+            diasRetraso = recargo;
+        } else if (abono > 0 || p.entregado) {
+            recargo = 0;
+            diasRetraso = 0;
+        } else if (p.fechaCobro) {
+            const hoyStr = obtenerFechaLocal();
+            const dHoy = new Date(hoyStr + 'T00:00:00');
+            const dCobro = new Date(p.fechaCobro + 'T00:00:00');
+            const diffDias = Math.floor((dHoy - dCobro) / (1000 * 60 * 60 * 24));
+            if (diffDias > 0) {
+                diasRetraso = diffDias;
+                recargo = diffDias * 1.00; // +$1.00 por cada día de retraso
+            }
+        }
+
+        const totalDeuda = deudaBase + recargo;
+        const pendiente = Math.max(0, totalDeuda - abono);
+
+        return {
+            costoPastichos,
+            costoDelivery,
+            deudaBase,
+            abono,
+            recargo,
+            diasRetraso,
+            totalDeuda,
+            pendiente,
+            pagadoCompleto: abono >= totalDeuda
+        };
+    }
+
+    // --- MONITOR DE PEDIDOS V24 ---
     function agregarPedido() {
-        let nombre = document.getElementById('mon-cliente').value.trim(), cant = parseInt(document.getElementById('mon-cant').value) || 1, fecha = document.getElementById('mon-fecha').value; 
+        let nombre = document.getElementById('mon-cliente').value.trim();
+        let cant = parseInt(document.getElementById('mon-cant').value) || 1;
+        let fecha = document.getElementById('mon-fecha').value;
+        let fechaCobro = document.getElementById('mon-fecha-cobro').value;
+        let tieneDelivery = document.getElementById('mon-tiene-delivery').checked;
+        let deliveryUSD = tieneDelivery ? parsearMoneda(document.getElementById('mon-delivery-usd').value) : 0;
+
         if(nombre === "") { alert("Ingresa el nombre del cliente."); return; }
         if(fecha === "") { fecha = obtenerFechaLocal(); }
+        if(fechaCobro === "") { fechaCobro = calcularSugerenciaCobro(fecha); }
         
-        let nuevo = { id: Date.now(), cliente: nombre, cantidad: cant, entregado: false, fecha: fecha, abonado: 0 };
+        // Si ya existen clientes en este mismo lote y no tenían fechaCobro o queremos mantener coherencia
+        let nuevo = { 
+            id: Date.now(), 
+            cliente: nombre, 
+            cantidad: cant, 
+            entregado: false, 
+            fecha: fecha, 
+            fechaCobro: fechaCobro,
+            deliveryUSD: deliveryUSD,
+            abonado: 0,
+            archivado: false
+        };
         
-        if(navigator.onLine) { database.ref('pedidos/' + nuevo.id).set(nuevo); } else {
+        if(navigator.onLine) { 
+            database.ref('pedidos/' + nuevo.id).set(nuevo); 
+        } else {
             let cola = JSON.parse(localStorage.getItem('bunker_pedidos')) || [];
             cola.push(nuevo); localStorage.setItem('bunker_pedidos', JSON.stringify(cola));
             dbPedidos.push(nuevo); renderizarPedidos(); 
             alert("📵 Guardado en el teléfono. Se subirá al recuperar señal.");
         }
-        document.getElementById('mon-cliente').value = ""; document.getElementById('mon-cant').value = "1";
+        
+        document.getElementById('mon-cliente').value = ""; 
+        document.getElementById('mon-cant').value = "1";
+        document.getElementById('mon-tiene-delivery').checked = false;
+        document.getElementById('mon-delivery-usd').value = "1,20";
+        toggleInputDelivery();
     }
 
     function abonarPedido(id) {
@@ -296,65 +507,176 @@
         let cliente = dbPedidos.find(c => c.id === id);
         if(!cliente) return;
         
-        let totalDeuda = cliente.cantidad * 10;
-        let pagoPrevio = cliente.abonado !== undefined ? cliente.abonado : (cliente.entregado ? totalDeuda : 0);
+        let info = calcularEstadoDeudaCliente(cliente);
 
-        let montoStr = prompt(`💵 PAGOS PARA: ${cliente.cliente}\nEl pedido total cuesta: $${totalDeuda}\nYa ha abonado: $${pagoPrevio}\n\nIngresa el MONTO TOTAL ACUMULADO que ha pagado hasta ahora (en $):`, pagoPrevio);
+        let desgloseMsg = `💵 PAGOS PARA: ${cliente.cliente}\n`;
+        desgloseMsg += `Pastichos (${cliente.cantidad} x $${PRECIO_UNITARIO_PASTICHO}): $${info.costoPastichos.toFixed(2)}\n`;
+        if (info.costoDelivery > 0) desgloseMsg += `Delivery: $${info.costoDelivery.toFixed(2)}\n`;
+        if (info.recargo > 0) desgloseMsg += `Recargo por retraso (${info.diasRetraso} día(s)): +$${info.recargo.toFixed(2)}\n`;
+        desgloseMsg += `----------------------------\n`;
+        desgloseMsg += `DEUDA TOTAL: $${info.totalDeuda.toFixed(2)}\n`;
+        desgloseMsg += `Ya ha abonado: $${info.abono.toFixed(2)}\n\n`;
+        desgloseMsg += `Ingresa el MONTO TOTAL ACUMULADO que ha pagado hasta ahora (en $):`;
+
+        let montoStr = prompt(desgloseMsg, info.abono > 0 ? info.abono : info.totalDeuda);
 
         if (montoStr !== null) {
             let abono = parseFloat(montoStr.replace(',', '.'));
             if (!isNaN(abono) && abono >= 0) {
-                let estaPagadoCompleto = abono >= totalDeuda;
-                database.ref('pedidos/' + id).update({ abonado: abono, entregado: estaPagadoCompleto });
+                // Al registrar un abono o pago completo, congelamos inmediatamente el recargo actual para que no siga subiendo
+                let recargoCongelado = abono > 0 ? info.recargo : null;
+                let totalConCongelado = info.deudaBase + (recargoCongelado || 0);
+                let estaPagadoCompleto = abono >= totalConCongelado;
+                
+                database.ref('pedidos/' + id).update({ 
+                    abonado: abono, 
+                    entregado: estaPagadoCompleto,
+                    recargoCongelado: recargoCongelado
+                });
             } else alert("Monto inválido.");
         }
     }
 
-    function borrarPedido(id) { if(navigator.onLine) { if(confirm("¿Eliminar cliente?")) database.ref('pedidos/' + id).remove(); } else alert("Debes tener internet."); }
+    function cambiarFechaCobroLote(fechaLote, fechaCobroActual) {
+        if(!navigator.onLine) { alert("Conéctate a internet para modificar la fecha de cobro."); return; }
+        let nuevaFecha = prompt(`📅 Ingresa la Fecha de Cobro para el lote del ${formatearFechaVisual(fechaLote)} (Formato AAAA-MM-DD, ej: 2026-11-30):`, fechaCobroActual || calcularSugerenciaCobro(fechaLote));
+        if (nuevaFecha && /^\d{4}-\d{2}-\d{2}$/.test(nuevaFecha.trim())) {
+            dbPedidos.filter(p => (p.fecha || 'Sin fecha asignada') === fechaLote && !p.archivado).forEach(p => {
+                database.ref('pedidos/' + p.id).update({ fechaCobro: nuevaFecha.trim() });
+            });
+        } else if (nuevaFecha !== null) {
+            alert("Formato inválido. Usa AAAA-MM-DD (ejemplo: 2026-11-30).");
+        }
+    }
+
+    function borrarPedido(id) { 
+        if(navigator.onLine) { 
+            if(confirm("¿Eliminar este registro permanentemente?")) database.ref('pedidos/' + id).remove(); 
+        } else alert("Debes tener internet."); 
+    }
     
+    // CAMBIO 5: Archivar guarda el lote en el historial de archivados en vez de borrarlo
     function archivarLote(fechaTarget) {
         if(!navigator.onLine) { alert("Conéctate a internet para archivar un lote."); return; }
-        if(confirm(`¿Archivar/eliminar el lote del ${fechaTarget}?`)) {
-            dbPedidos.filter(p => (p.fecha || 'Sin fecha asignada') === fechaTarget).forEach(p => { database.ref('pedidos/' + p.id).remove(); });
+        if(confirm(`¿Enviar el lote del ${formatearFechaVisual(fechaTarget)} al historial de Listas Archivadas?`)) {
+            dbPedidos.filter(p => (p.fecha || 'Sin fecha asignada') === fechaTarget && !p.archivado).forEach(p => { 
+                database.ref('pedidos/' + p.id).update({ archivado: true }); 
+            });
+        }
+    }
+
+    function restaurarLoteArchivado(fechaTarget) {
+        if(!navigator.onLine) { alert("Conéctate a internet para restaurar un lote."); return; }
+        if(confirm(`¿Restaurar el lote del ${formatearFechaVisual(fechaTarget)} a la lista de pedidos activos?`)) {
+            dbPedidos.filter(p => (p.fecha || 'Sin fecha asignada') === fechaTarget && p.archivado).forEach(p => { 
+                database.ref('pedidos/' + p.id).update({ archivado: false }); 
+            });
+        }
+    }
+
+    function eliminarLoteArchivadoDefinitivo(fechaTarget) {
+        if(!navigator.onLine) { alert("Conéctate a internet para eliminar un lote."); return; }
+        if(confirm(`⚠️ ¿Eliminar permanentemente el lote archivado del ${formatearFechaVisual(fechaTarget)}? Esta acción no se puede deshacer.`)) {
+            dbPedidos.filter(p => (p.fecha || 'Sin fecha asignada') === fechaTarget && p.archivado).forEach(p => { 
+                database.ref('pedidos/' + p.id).remove(); 
+            });
         }
     }
 
     function renderizarPedidos() {
-        const div = document.getElementById('lista-pedidos'); div.innerHTML = ""; 
-        if (dbPedidos.length === 0) { div.innerHTML = "<p style='text-align:center; color:#7f8c8d; font-style:italic;'>No hay preventas registradas.</p>"; return; }
+        const esArchivo = viendoArchivados;
+        const div = document.getElementById(esArchivo ? 'lista-pedidos-archivados' : 'lista-pedidos'); 
+        div.innerHTML = ""; 
+
+        const terminoBusqueda = (document.getElementById(esArchivo ? 'buscador-archivados' : 'buscador-clientes').value || "").trim().toLowerCase();
+
+        // Filtrar según vista (Activos vs Archivados) y según el buscador de clientes
+        const pedidosFiltrados = dbPedidos.filter(p => {
+            const coincideArchivo = esArchivo ? (p.archivado === true) : (!p.archivado);
+            const coincideNombre = terminoBusqueda === "" || (p.cliente || "").toLowerCase().includes(terminoBusqueda);
+            return coincideArchivo && coincideNombre;
+        });
+
+        if (pedidosFiltrados.length === 0) { 
+            div.innerHTML = `<p style='text-align:center; color:#7f8c8d; font-style:italic;'>${terminoBusqueda ? 'No se encontraron clientes con ese nombre.' : (esArchivo ? 'No hay listas archivadas todavía.' : 'No hay preventas activas registradas.')}</p>`; 
+            return; 
+        }
         
         const pedidosPorFecha = {};
-        dbPedidos.forEach(p => { 
+        pedidosFiltrados.forEach(p => { 
             let f = p.fecha || 'Sin fecha asignada'; 
-            if (!pedidosPorFecha[f]) pedidosPorFecha[f] = { items: [], activos: 0 }; 
+            if (!pedidosPorFecha[f]) pedidosPorFecha[f] = { items: [], activos: 0, fechaCobroLote: p.fechaCobro || "" }; 
             pedidosPorFecha[f].items.push(p); 
+            if (!pedidosPorFecha[f].fechaCobroLote && p.fechaCobro) {
+                pedidosPorFecha[f].fechaCobroLote = p.fechaCobro;
+            }
             
-            let totalDeuda = p.cantidad * 10;
-            let abono = p.abonado !== undefined ? p.abonado : (p.entregado ? totalDeuda : 0);
-            if (abono < totalDeuda) { pedidosPorFecha[f].activos += p.cantidad; } 
+            let info = calcularEstadoDeudaCliente(p);
+            if (!info.pagadoCompleto) { pedidosPorFecha[f].activos += p.cantidad; } 
         });
 
         Object.keys(pedidosPorFecha).sort().reverse().forEach(fecha => {
-            let lote = pedidosPorFecha[fecha], etiquetaFecha = fecha;
-            if (fecha !== 'Sin fecha asignada') { const partes = fecha.split('-'); if (partes.length === 3) etiquetaFecha = `${partes[2]}/${partes[1]}/${partes[0]}`; }
+            let lote = pedidosPorFecha[fecha];
+            let etiquetaFecha = formatearFechaVisual(fecha);
+            let etiquetaCobro = lote.fechaCobroLote ? formatearFechaVisual(lote.fechaCobroLote) : 'Sin asignar';
             
-            let htmlGrupo = `<div style="margin-top: 25px; border: 1px solid #34495e; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);"><div style="background: #34495e; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;"><h4 style="margin: 0; font-size: 16px;">📅 Lote: ${etiquetaFecha} <br><span style="font-size: 14px; color: #f1c40f; font-weight: normal;">(Faltan: <b>${lote.activos}</b> pastichos por cobrar)</span></h4><button class="btn btn-delete" style="background: #e74c3c; width: auto; height: auto; border-radius: 6px; padding: 6px 12px; font-size: 12px;" onclick="archivarLote('${fecha}')">📦 Archivar</button></div><div style="padding: 10px; background: #fdfdfd;">`;
+            let botonesLoteHTML = "";
+            if (!esArchivo) {
+                botonesLoteHTML = `
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <button class="btn" style="background: #2980b9; width: auto; height: auto; border-radius: 6px; padding: 6px 10px; font-size: 12px;" onclick="cambiarFechaCobroLote('${fecha}', '${lote.fechaCobroLote}')">📅 Cobro</button>
+                        <button class="btn btn-delete" style="background: #e74c3c; width: auto; height: auto; border-radius: 6px; padding: 6px 12px; font-size: 12px;" onclick="archivarLote('${fecha}')">📦 Archivar</button>
+                    </div>
+                `;
+            } else {
+                botonesLoteHTML = `
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <button class="btn" style="background: #27ae60; width: auto; height: auto; border-radius: 6px; padding: 6px 12px; font-size: 12px;" onclick="restaurarLoteArchivado('${fecha}')">♻️ Restaurar</button>
+                        <button class="btn btn-delete" style="background: #c0392b; width: auto; height: auto; border-radius: 6px; padding: 6px 12px; font-size: 12px;" onclick="eliminarLoteArchivadoDefinitivo('${fecha}')">🗑️ Borrar</button>
+                    </div>
+                `;
+            }
+
+            let htmlGrupo = `
+                <div style="margin-top: 25px; border: 1px solid #34495e; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div style="background: ${esArchivo ? '#5b2c6f' : '#34495e'}; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <h4 style="margin: 0; font-size: 16px;">
+                            📅 Lote: ${etiquetaFecha} ${lote.fechaCobroLote ? `<span style="font-size:13px; background:rgba(255,255,255,0.18); padding:2px 8px; border-radius:12px; margin-left:6px;">🔔 Cobro: ${etiquetaCobro}</span>` : ''}
+                            <br><span style="font-size: 14px; color: #f1c40f; font-weight: normal;">(Faltan: <b>${lote.activos}</b> pastichos por cobrar)</span>
+                        </h4>
+                        ${botonesLoteHTML}
+                    </div>
+                    <div style="padding: 10px; background: #fdfdfd;">
+            `;
             
             lote.items.forEach(p => { 
-                let totalDeuda = p.cantidad * 10;
-                let abono = p.abonado !== undefined ? p.abonado : (p.entregado ? totalDeuda : 0);
-                let pendiente = totalDeuda - abono;
+                let info = calcularEstadoDeudaCliente(p);
+
+                let detallesExtra = [];
+                if (info.costoDelivery > 0) detallesExtra.push(`🛵 Delivery: $${info.costoDelivery.toFixed(2)}`);
+                if (info.recargo > 0) detallesExtra.push(`⚠️ Recargo mora (${info.diasRetraso}d): +$${info.recargo.toFixed(2)}`);
+                let textoExtra = detallesExtra.length > 0 ? ` | ${detallesExtra.join(' | ')}` : '';
 
                 let claseCard = "", htmlEstado = "";
-                if (abono >= totalDeuda) { claseCard = "card-pagada"; htmlEstado = `<div class="estado-pago pago-completo">✅ Pago Completo ($${abono})</div>`; }
-                else if (abono > 0) { htmlEstado = `<div class="estado-pago pago-parcial">⏳ Abonó: $${abono.toFixed(2)} | Pendiente: $${pendiente.toFixed(2)}</div>`; }
-                else { htmlEstado = `<div class="estado-pago" style="background:#eee; color:#666;">Debe: $${totalDeuda.toFixed(2)}</div>`; }
+                if (info.pagadoCompleto) { 
+                    claseCard = "card-pagada"; 
+                    htmlEstado = `<div class="estado-pago pago-completo">✅ Pago Completo ($${info.abono.toFixed(2)})${textoExtra}</div>`; 
+                } else if (info.abono > 0) { 
+                    htmlEstado = `<div class="estado-pago pago-parcial">⏳ Abonó: $${info.abono.toFixed(2)} | Pendiente: $${info.pendiente.toFixed(2)}${textoExtra}</div>`; 
+                } else { 
+                    let claseMora = info.recargo > 0 ? "pago-mora" : "";
+                    let estiloBase = info.recargo > 0 ? "" : "background:#eee; color:#666;";
+                    htmlEstado = `<div class="estado-pago ${claseMora}" style="${estiloBase}">Debe: $${info.totalDeuda.toFixed(2)}${textoExtra}</div>`; 
+                }
+
+                let infoCobroIndividual = p.fechaCobro ? `<span style="font-size: 12px; color: #7f8c8d; display:block; margin-top:2px;">📅 Fecha límite de cobro: ${formatearFechaVisual(p.fechaCobro)}</span>` : '';
 
                 htmlGrupo += `
                     <div class="cliente-card ${claseCard}">
                         <div class="cliente-info">
                             <h4>📦 ${p.cliente}</h4>
-                            <p>Solicitó: <strong>${p.cantidad}</strong> pasticho(s)</p>
+                            <p>Solicitó: <strong>${p.cantidad}</strong> pasticho(s) ($${info.costoPastichos.toFixed(2)})</p>
+                            ${infoCobroIndividual}
                             ${htmlEstado}
                         </div>
                         <div class="cliente-acciones">
@@ -368,13 +690,21 @@
         });
     }
 
-    // --- FACTURACIÓN ---
+    // --- FACTURACIÓN V24 (PRECIO $11.00 Y DELIVERY EN DÓLARES $1.20 POR DEFECTO) ---
     function generarReciboWA() {
-        let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente", cant = parseInt(document.getElementById('fac-cant').value) || 1, precioUSD = parsearMoneda(document.getElementById('fac-precio').value), deliveryBs = parsearMoneda(document.getElementById('fac-delivery').value), tasa = parsearMoneda(document.getElementById('fac-tasa').value);
+        let cliente = document.getElementById('fac-cliente').value.trim() || "Cliente", 
+            cant = parseInt(document.getElementById('fac-cant').value) || 1, 
+            precioUSD = parsearMoneda(document.getElementById('fac-precio').value), 
+            deliveryUSD = parsearMoneda(document.getElementById('fac-delivery').value), 
+            tasa = parsearMoneda(document.getElementById('fac-tasa').value);
         if(tasa <= 0) { alert("Ingresa la tasa BCV."); return; }
-        let totalUSD = Math.round(((cant * precioUSD) + (deliveryBs / tasa)) * 100) / 100, totalBs = totalUSD * tasa;
+        
+        let totalUSD = Math.round(((cant * precioUSD) + deliveryUSD) * 100) / 100;
+        let totalBs = totalUSD * tasa;
+        let deliveryBs = deliveryUSD * tasa;
+
         let msg = `🧾 *RECIBO DE COMPRA - PASTICHOS*\n\n👤 *Cliente:* ${cliente}\n📦 *Pedido:* ${cant} Pasticho(s) x $${floatAFormatoMoneda(precioUSD)}\n`;
-        if(deliveryBs > 0) msg += `🛵 *Delivery:* ${floatAFormatoMoneda(deliveryBs)} Bs\n`;
+        if(deliveryUSD > 0) msg += `🛵 *Delivery:* $${floatAFormatoMoneda(deliveryUSD)} (${floatAFormatoMoneda(deliveryBs)} Bs)\n`;
         msg += `\n💵 *Total en Divisas: $${floatAFormatoMoneda(totalUSD)}*\n🇻🇪 *Total en Bolívares: ${floatAFormatoMoneda(totalBs)} Bs*\n_(Tasa BCV: ${floatAFormatoMoneda(tasa)} Bs/$)_\n\n¡Gracias por preferirnos! 🍕\n\n💳 *PAGO MÓVIL BANESCO* 👇\n🏦 Banco: 0134\n📱 Cel: 04248536405\n🪪 C.I: 31074703`;
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
@@ -386,7 +716,9 @@
     window.onload = () => { 
         cargarListasLimpias(); 
         let hoy = obtenerFechaLocal();
-        document.getElementById('fecha').value = hoy; document.getElementById('mon-fecha').value = hoy; 
+        document.getElementById('fecha').value = hoy; 
+        document.getElementById('mon-fecha').value = hoy; 
+        sugerirFechaCobro();
         document.getElementById('fecha').addEventListener('change', buscarTasa); 
         buscarTasa(); chequearInternet(); 
     };
@@ -410,7 +742,7 @@
     function limpiarTodo(silencioso = false) { 
         if(silencioso || confirm("¿Borrar precios?")) { 
             document.querySelectorAll('.monto-input, #deliveryBs').forEach(i => i.value = "");
-            document.getElementById('cantPastichos').value = "10"; document.getElementById('precioPasticho').value = "10,00";
+            document.getElementById('cantPastichos').value = "10"; document.getElementById('precioPasticho').value = "11,00";
             buscarTasa(); 
         } 
     }
@@ -462,7 +794,7 @@
         if(!navigator.onLine) { alert("Conéctate a internet para poder editar facturas."); return; }
         let reg = dbHistorial.find(r => r.id === id); if(!reg || !confirm("Devolver datos para corregir. ¿Continuar?")) return;
         document.getElementById('fecha').value = reg.fecha; document.getElementById('tasa').value = floatAFormatoMoneda(reg.tasa);
-        document.getElementById('cantPastichos').value = reg.cantP || 10; document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 10); document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
+        document.getElementById('cantPastichos').value = reg.cantP || 10; document.getElementById('precioPasticho').value = floatAFormatoMoneda(reg.precioP || 11); document.getElementById('deliveryBs').value = floatAFormatoMoneda(reg.deliveryBs || 0);
         cargarListasLimpias(); 
         
         let poblar = (lista, cont) => { lista.forEach(i => {
@@ -496,13 +828,14 @@
     }
     function iniciarDictado() { if (!recognition) { alert("Navegador no soporta voz."); return; } reconociendo ? recognition.stop() : recognition.start(); }
 
-    function exportarBaseDatos() { saveAs(new Blob([JSON.stringify({ historial: dbHistorial, tasas: dbTasas })], { type: "application/json" }), "Respaldo_Pastichos.json"); }
+    function exportarBaseDatos() { saveAs(new Blob([JSON.stringify({ historial: dbHistorial, tasas: dbTasas, pedidos: dbPedidos })], { type: "application/json" }), "Respaldo_Pastichos_v24.json"); }
     function importarBaseDatos(event) {
         let reader = new FileReader();
         reader.onload = function(e) {
             try {
                 let data = JSON.parse(e.target.result);
                 if (data.historial) data.historial.forEach(reg => database.ref('historial/' + reg.id).set(reg));
+                if (data.pedidos) data.pedidos.forEach(ped => database.ref('pedidos/' + ped.id).set(ped));
                 if (data.tasas) { localStorage.setItem('tasasBCV_Memoria', JSON.stringify(data.tasas)); dbTasas = data.tasas; }
                 alert("¡Datos subidos a la Nube con éxito!");
             } catch (err) { alert("Error al leer el archivo."); }
@@ -510,7 +843,7 @@
         if(event.target.files[0]) reader.readAsText(event.target.files[0]);
     }
 
-    // --- EXCEL V23.0 (4 PESTAÑAS Y SIN DECIMALES LARGOS) ---
+    // --- EXCEL INTACTO DE 4 PESTAÑAS ---
     async function exportarExcelV23() {
         if (typeof ExcelJS === 'undefined') { alert("Cargando librerías de Excel, intenta en un segundo..."); return; }
         if (dbHistorial.length === 0) { alert("No hay datos en el historial para exportar"); return; }
